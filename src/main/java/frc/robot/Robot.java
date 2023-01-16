@@ -82,9 +82,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    // schedule the autonomous command (example)
-    //swerve.  
-
+    
   }
 
   /** This function is called periodically during autonomous. */
