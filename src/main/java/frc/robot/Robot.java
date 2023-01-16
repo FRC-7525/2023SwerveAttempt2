@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    
+
   }
 
   /** This function is called periodically during autonomous. */
@@ -98,9 +98,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double translationVal = MathUtil.applyDeadband(controller.getRightY(), Constants.stickDeadband);
-    double strafeVal = MathUtil.applyDeadband(controller.getLeftX(), Constants.stickDeadband);
-    double rotationVal = MathUtil.applyDeadband(controller.getRightX(), Constants.stickDeadband);
+    double translationVal = -MathUtil.applyDeadband(controller.getLeftY(), Constants.stickDeadband);
+    double rotationVal = -0.3 * MathUtil.applyDeadband(controller.getRightX(), Constants.stickDeadband);
+    double strafeVal = -MathUtil.applyDeadband(controller.getLeftX(), Constants.stickDeadband);
 
     /* Drive */
     swerve.drive(
