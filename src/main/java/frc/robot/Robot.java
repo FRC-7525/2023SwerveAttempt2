@@ -98,9 +98,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double translationVal = -MathUtil.applyDeadband(controller.getLeftY(), Constants.stickDeadband);
-    double rotationVal = -0.3 * MathUtil.applyDeadband(controller.getRightX(), Constants.stickDeadband);
-    double strafeVal = -MathUtil.applyDeadband(controller.getLeftX(), Constants.stickDeadband);
+    double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftY()), Constants.stickDeadband);
+    double rotationVal = -0.3 * MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
+    double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftX()), Constants.stickDeadband);
 
     /* Drive */
     swerve.drive(
