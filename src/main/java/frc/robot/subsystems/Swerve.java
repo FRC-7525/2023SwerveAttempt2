@@ -39,7 +39,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public static double squareInput(double input) {
-        double output;
+       // double output;
 
         // if (input < 0) {
         //     output = -(Math.pow(input, 2));
@@ -47,7 +47,7 @@ public class Swerve extends SubsystemBase {
         //     output = Math.pow(input, 2);
         // }
 
-        return input * 0.25;
+        return input * SmartDashboard.getNumber("speed", 1);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
