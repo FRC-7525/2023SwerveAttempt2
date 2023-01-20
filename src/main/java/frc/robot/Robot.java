@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Swerve;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -27,6 +29,8 @@ public class Robot extends TimedRobot {
 
   private Swerve swerve;
 
+  private boolean toggleFieldRelative;
+
   XboxController controller = new XboxController(0);
 
   /**
@@ -41,8 +45,10 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     ctreConfigs = new CTREConfigs();
     swerve = new Swerve();
+    SmartDashboard.putNumber("speed", 1);
+    SmartDashboard.putNumber("rotationSpeed", 1);
   }
-
+  
   /**
    * This function is called every robot packet, no matter the mode. Use this for
    * items like
@@ -64,6 +70,7 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     //CommandScheduler.getInstance().run();
+    SmartDashboard.putBoolean("Field Relative", toggleFieldRelative);
     swerve.periodic();
   }
 
@@ -71,11 +78,11 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
   }
-
+  
   @Override
   public void disabledPeriodic() {
   }
-
+  
   /**
    * This autonomous runs the autonomous command selected by your
    * {@link RobotContainer} class.
@@ -98,15 +105,20 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+
+    if (controller.getXButtonPressed()) {
+      toggleFieldRelative = !toggleFieldRelative;
+    }
+
     double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftY()), Constants.stickDeadband);
-    double rotationVal = -0.3 * MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
+    double rotationVal = -SmartDashboard.getNumber("rotationSpeed", 1) * MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
     double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftX()), Constants.stickDeadband);
 
     /* Drive */
     swerve.drive(
         new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
         rotationVal * Constants.Swerve.maxAngularVelocity,
-        false,
+        toggleFieldRelative,
         true);
   }
 

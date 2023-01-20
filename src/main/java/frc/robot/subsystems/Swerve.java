@@ -8,7 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
-//import com.ctre.phoenix.sensors.Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,14 +17,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.SerialPort;
 
 public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
-    //public Pigeon2 gyro;
+    public AHRS gyro;
 
     public Swerve() {
-        //gyro = new Pigeon2(Constants.Swerve.pigeonID);
+        gyro = new AHRS(SerialPort.Port.kUSB1);
         //gyro.configFactoryDefault();
         zeroGyro();
 
@@ -53,13 +54,13 @@ public class Swerve extends SubsystemBase {
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-                /*fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
                                     getYaw()
                                 )
-                                : */new ChassisSpeeds(
+                                : new ChassisSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation)
@@ -105,11 +106,11 @@ public class Swerve extends SubsystemBase {
     }
 
     public void zeroGyro(){
-        //gyro.setYaw(0);
+        gyro.zeroYaw();
     }
 
     public Rotation2d getYaw() {
-        return Rotation2d.fromDegrees(0); //(Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
     public void resetModulesToAbsolute(){
