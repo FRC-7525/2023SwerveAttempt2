@@ -15,6 +15,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -32,6 +38,8 @@ public class Robot extends TimedRobot {
   private boolean toggleFieldRelative;
 
   XboxController controller = new XboxController(0);
+
+  public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -120,7 +128,26 @@ public class Robot extends TimedRobot {
         rotationVal * Constants.Swerve.maxAngularVelocity,
         toggleFieldRelative,
         false);
+
+         var result = camera.getLatestResult();
+    boolean hasTargets = result.hasTargets();
+    List<PhotonTrackedTarget> targets = result.getTargets();
+    
+    SmartDashboard.putBoolean("Has Target", hasTargets);
+    
+    List<Double> ids = new ArrayList<Double>();
+    if (hasTargets) {
+      for (PhotonTrackedTarget target : targets) {
+        ids.add(Double.valueOf(target.getFiducialId()));
+
+
+      }
+    }
+    SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
+    
+    
   }
+  
 
   @Override
   public void testInit() {
