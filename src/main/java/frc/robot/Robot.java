@@ -53,8 +53,8 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     ctreConfigs = new CTREConfigs();
     swerve = new Swerve();
-    SmartDashboard.putNumber("speed", 1);
-    SmartDashboard.putNumber("rotationSpeed", 1);
+    SmartDashboard.putNumber("Speed", 1);
+    SmartDashboard.putNumber("Rotation Speed", 1);
   }
   
   /**
@@ -78,7 +78,9 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     //CommandScheduler.getInstance().run();
+
     SmartDashboard.putBoolean("Field Relative", toggleFieldRelative);
+
     swerve.periodic();
   }
 
@@ -119,7 +121,7 @@ public class Robot extends TimedRobot {
     }
 
     double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftY()), Constants.stickDeadband);
-    double rotationVal = -SmartDashboard.getNumber("rotationSpeed", 1) * MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
+    double rotationVal = -SmartDashboard.getNumber("Rotation Speed", 1) * MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
     double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftX()), Constants.stickDeadband);
 
     /* Drive */
@@ -129,23 +131,22 @@ public class Robot extends TimedRobot {
         toggleFieldRelative,
         false);
 
-         var result = camera.getLatestResult();
+    var result = camera.getLatestResult();
+
     boolean hasTargets = result.hasTargets();
     List<PhotonTrackedTarget> targets = result.getTargets();
-    
-    SmartDashboard.putBoolean("Has Target", hasTargets);
     
     List<Double> ids = new ArrayList<Double>();
     if (hasTargets) {
       for (PhotonTrackedTarget target : targets) {
         ids.add(Double.valueOf(target.getFiducialId()));
-
-
+        
+        
       }
     }
+    
+    SmartDashboard.putBoolean("Has Target", hasTargets);
     SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
-    
-    
   }
   
 
