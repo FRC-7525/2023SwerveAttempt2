@@ -146,7 +146,7 @@ public class Robot extends TimedRobot {
     }
     
     SmartDashboard.putBoolean("Has Target", hasTargets);
-    SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
+    SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());  
   }
   
 
