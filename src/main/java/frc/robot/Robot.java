@@ -13,13 +13,21 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -55,7 +63,34 @@ public class Robot extends TimedRobot {
     swerve = new Swerve();
     SmartDashboard.putNumber("Speed", 1);
     SmartDashboard.putNumber("Rotation Speed", 1);
+    Pose3d pose1 = new Pose3d(0,inToMeters(-20.9),0,new Rotation3d(0,0, 0));
+    Pose3d pose2 = new Pose3d(0,inToMeters(-50.25),0,new Rotation3d(0,0, 0));
+    Pose3d pose3 = new Pose3d(0,inToMeters(-84.7),0,new Rotation3d(0,0, 0));
+    
+    AprilTag tag1 = new AprilTag(1, pose1);
+    AprilTag tag2 = new AprilTag(2, pose2);
+    AprilTag tag3 = new AprilTag(3, pose3);
+
+    double fieldLength = 2.8194;
+    double fieldWidth = 2.8194;
+
+    List<AprilTag> tags = new ArrayList<>();
+
+    tags.add(tag1);
+    tags.add(tag2);
+    tags.add(tag3);
+
+    AprilTagFieldLayout layout = new AprilTagFieldLayout(tags, fieldLength, fieldWidth);
+
+    Transform3d cameraToBot = new Transform3d(new Translation3d(0.0, 0.0, 0.5), new Rotation3d(0,0,0));
+
+    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(layout, PoseStrategy.AVERAGE_BEST_TARGETS, camera, cameraToBot);
   }
+
+  private double inToMeters(double inches) {
+    return inches * 0.0254;
+  }
+
   
   /**
    * This function is called every robot packet, no matter the mode. Use this for
@@ -82,6 +117,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Field Relative", toggleFieldRelative);
 
     swerve.periodic();
+
+    
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -99,7 +136,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-
+    //choose auto program!
   }
 
   /** This function is called periodically during autonomous. */
