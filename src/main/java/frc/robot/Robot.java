@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.geometry_helpers.decomposition;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,7 +22,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -120,9 +123,14 @@ public class Robot extends TimedRobot {
 
     swerve.periodic();
 
-    photonPoseEstimator.update();
+    Optional<EstimatedRobotPose> optionalPoseEstimate = photonPoseEstimator.update();
+    EstimatedRobotPose poseEstimate = optionalPoseEstimate.get();
+    List<Double> pose = decomposition.DecomposePose3d(poseEstimate.estimatedPose);
+    //put to SmartDashboard
+    
   }
 
+  
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
