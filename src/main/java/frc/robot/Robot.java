@@ -13,12 +13,15 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
@@ -31,133 +34,150 @@ import org.photonvision.targeting.PhotonTrackedTarget;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static CTREConfigs ctreConfigs;
+    public static CTREConfigs ctreConfigs;
 
-  private Swerve swerve;
+    private Swerve swerve;
 
-  private boolean toggleFieldRelative;
+    private boolean toggleFieldRelative;
 
-  XboxController controller = new XboxController(0);
+    XboxController controller = new XboxController(0);
 
-  public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
+    public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our
-    // autonomous chooser on the dashboard.
-    ctreConfigs = new CTREConfigs();
-    swerve = new Swerve();
-    SmartDashboard.putNumber("Speed", 1);
-    SmartDashboard.putNumber("Rotation Speed", 1);
-  }
-  
-  /**
-   * This function is called every robot packet, no matter the mode. Use this for
-   * items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and
-   * test.
-   *
-   * <p>
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled
-    // commands, running already-scheduled commands, removing finished or
-    // interrupted commands,
-    // and running subsystem periodic() methods. This must be called from the
-    // robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    //CommandScheduler.getInstance().run();
+    private static String ROTATION_SPEED_SD = "Roation Speed";
+    private static String FIELD_SENSITIVE_SD = "Field Sensitive";
+    private static String X_POSITION_SD = "X Position";
+    private static String Y_POSITION_SD = "Y Position";
 
-    SmartDashboard.putBoolean("Field Relative", toggleFieldRelative);
-
-    swerve.periodic();
-  }
-
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {
-  }
-  
-  @Override
-  public void disabledPeriodic() {
-  }
-  
-  /**
-   * This autonomous runs the autonomous command selected by your
-   * {@link RobotContainer} class.
-   */
-  @Override
-  public void autonomousInit() {
-
-  }
-
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-  }
-
-  @Override
-  public void teleopInit() {
     
-  }
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
 
-    if (controller.getXButtonPressed()) {
-      toggleFieldRelative = !toggleFieldRelative;
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any
+     * initialization code.
+     */
+    @Override
+    public void robotInit() {
+        // Instantiate our RobotContainer. This will perform all our button bindings,
+        // and put our
+        // autonomous chooser on the dashboard.
+        ctreConfigs = new CTREConfigs();
+        swerve = new Swerve();
+        
+        SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
+        SmartDashboard.putNumber(FIELD_SENSITIVE_SD, kDefaultPeriod)
+       
+
+    /**
+     * This function is called every robot packet, no matter the mode. Use this for
+     * items like
+     * diagnostics that you want ran during disabled, autonomous, teleoperated and
+     * test.
+     *
+     * <p>
+     * This runs after the mode specific periodic functions, but before LiveWindow
+     * and
+     * SmartDashboard integrated updating.
+     */
+    @Override
+    public void robotPeriodic() {
+        // Runs the Scheduler. This is responsible for polling buttons, adding
+        // newly-scheduled
+        // commands, running already-scheduled commands, removing finished or
+        // interrupted commands,
+        // and running subsystem periodic() methods. This must be called from the
+        // robot's periodic
+        // block in order for anything in the Command-based framework to work.
+        // CommandScheduler.getInstance().run();
+
+        SmartDashboard.putBoolean(FIELD_SENSITIVE_SD, toggleFieldRelative);
+
+        swerve.periodic();
+
+        Pose2d pose = swerve.getPose();
+        double x_position = pose.getX();
+        double y_position = pose.getY();
+        SmartDashboard.putNumber(X_POSITION_SD, x_position);
+        SmartDashboard.putNumber(Y_POSITION_SD, y_position);
     }
 
-    double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftY()), Constants.stickDeadband);
-    double rotationVal = -SmartDashboard.getNumber("Rotation Speed", 1) * MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
-    double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftX()), Constants.stickDeadband);
+    /** This function is called once each time the robot enters Disabled mode. */
+    @Override
+    public void disabledInit() {
 
-    /* Drive */
-    swerve.drive(
-        new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
-        rotationVal * Constants.Swerve.maxAngularVelocity,
-        toggleFieldRelative,
-        false);
-
-    var result = camera.getLatestResult();
-
-    boolean hasTargets = result.hasTargets();
-    List<PhotonTrackedTarget> targets = result.getTargets();
-    
-    List<Double> ids = new ArrayList<Double>();
-    if (hasTargets) {
-      for (PhotonTrackedTarget target : targets) {
-        ids.add(Double.valueOf(target.getFiducialId()));
-        
-        
-      }
     }
-    
-    SmartDashboard.putBoolean("Has Target", hasTargets);
-    SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());  
-  }
-  
 
-  @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
+    @Override
+    public void disabledPeriodic() {
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {
-  }
+    }
+
+    /**
+     * This autonomous runs the autonomous command selected by your
+     * {@link RobotContainer} class.
+     */
+    @Override
+    public void autonomousInit() {
+
+    }
+
+    /** This function is called periodically during autonomous. */
+    @Override
+    public void autonomousPeriodic() {
+    }
+
+    @Override
+    public void teleopInit() {
+
+    }
+
+    /** This function is called periodically during operator control. */
+    @Override
+    public void teleopPeriodic() {
+        /* Drive */
+        if (controller.getXButtonPressed()) {
+            toggleFieldRelative = !toggleFieldRelative;
+        }
+
+        if (controller.getAButtonPressed()) {
+            swerve.zeroGyro();
+        }
+
+        double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftY()), Constants.stickDeadband);
+        double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
+        rotationVal *= SmartDashboard.getNumber("Rotation Speed", 1);
+
+        double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftX()), Constants.stickDeadband);
+
+        swerve.drive(
+                new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
+                rotationVal * Constants.Swerve.maxAngularVelocity,
+                toggleFieldRelative,
+                false);
+
+        
+        /* Vision */
+        PhotonPipelineResult result = camera.getLatestResult();
+        List<PhotonTrackedTarget> targets = result.getTargets();
+
+        List<Double> ids = new ArrayList<Double>();
+        for (PhotonTrackedTarget target : targets) {
+            ids.add(Double.valueOf(target.getFiducialId()));
+        }
+
+        SmartDashboard.putBoolean("Has Target", !targets.isEmpty());
+        SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
+    }
+
+    @Override
+    public void testInit() {
+        // Cancels all running commands at the start of test mode.
+        CommandScheduler.getInstance().cancelAll();
+    }
+
+    /** This function is called periodically during test mode. */
+    @Override
+    public void testPeriodic() {
+    }
 }
