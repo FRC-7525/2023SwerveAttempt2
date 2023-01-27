@@ -49,6 +49,8 @@ public class Robot extends TimedRobot {
 
   public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
+  PhotonPoseEstimator photonPoseEstimator;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any
@@ -84,7 +86,7 @@ public class Robot extends TimedRobot {
 
     Transform3d cameraToBot = new Transform3d(new Translation3d(0.0, 0.0, 0.5), new Rotation3d(0,0,0));
 
-    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(layout, PoseStrategy.AVERAGE_BEST_TARGETS, camera, cameraToBot);
+    photonPoseEstimator = new PhotonPoseEstimator(layout, PoseStrategy.AVERAGE_BEST_TARGETS, camera, cameraToBot);
   }
 
   private double inToMeters(double inches) {
@@ -118,7 +120,7 @@ public class Robot extends TimedRobot {
 
     swerve.periodic();
 
-    
+    photonPoseEstimator.update();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
