@@ -16,10 +16,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import java.util.ArrayList;
 import java.util.List;
-import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -39,11 +37,10 @@ public class Robot extends TimedRobot {
 
     XboxController controller = new XboxController(0);
 
-    public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
-
-    private static String ROTATION_SPEED_SD = "Roation Speed";
+    private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_SENSITIVE_SD = "Field Sensitive";
 
+    public final Camera camera = new Camera("Swerve_Front");
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -88,6 +85,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_SENSITIVE_SD, toggleFieldRelative);
 
         swerve.periodic();
+        camera.periodic();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
