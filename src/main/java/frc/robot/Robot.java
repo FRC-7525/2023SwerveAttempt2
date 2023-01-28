@@ -90,6 +90,8 @@ public class Robot extends TimedRobot {
     Transform3d cameraToBot = new Transform3d(new Translation3d(0.0, 0.0, 0.5), new Rotation3d(0,0,0));
 
     photonPoseEstimator = new PhotonPoseEstimator(layout, PoseStrategy.AVERAGE_BEST_TARGETS, camera, cameraToBot);
+
+    
   }
 
   private double inToMeters(double inches) {
@@ -125,9 +127,21 @@ public class Robot extends TimedRobot {
 
     Optional<EstimatedRobotPose> optionalPoseEstimate = photonPoseEstimator.update();
     EstimatedRobotPose poseEstimate = optionalPoseEstimate.get();
-    List<Double> pose = decomposition.DecomposePose3d(poseEstimate.estimatedPose);
-    //put to SmartDashboard
+
+    List<Double> pose = decomposition.DecomposePose3d(poseEstimate.estimatedPose);    
+    Double[]posArray = new Double [pose.size()];
+    pose.toArray(posArray);
+
+    List<Double> rotations = decomposition.Decompose_Rotation_3d(poseEstimate.estimatedPose.getRotation());
+    Double[]rotationsArray = new Double [rotations.size()];
+    rotations.toArray(rotationsArray);
     
+
+
+    //put to SmartDashboard
+    SmartDashboard.putNumberArray("Pose", posArray);
+    SmartDashboard.putNumberArray("Rotations", rotationsArray);
+
   }
 
   
