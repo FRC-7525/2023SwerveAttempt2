@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
         swerve = new Swerve();
         
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
-        SmartDashboard.putNumber(FIELD_SENSITIVE_SD, kDefaultPeriod)
+        SmartDashboard.putNumber(FIELD_SENSITIVE_SD, kDefaultPeriod);
        
 
     /**
