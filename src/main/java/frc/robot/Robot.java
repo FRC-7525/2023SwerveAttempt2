@@ -126,6 +126,11 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
+        swerve.drive(
+            new Translation2d(1, 0).times(0.45),
+            0,
+            false,
+            false);
     }
 
     @Override
