@@ -67,6 +67,7 @@ public class Robot extends TimedRobot {
         
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putNumber(FIELD_SENSITIVE_SD, kDefaultPeriod);
+    }
        
 
     /**
