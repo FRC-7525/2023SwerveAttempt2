@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
     public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
     private static String ROTATION_SPEED_SD = "Roation Speed";
-    private static String FIELD_SENSITIVE_SD = "Field Sensitive";
+    private static String FIELD_RELATIVE_SD = "Field RELATIVE";
     private static String X_POSITION_SD = "X Position";
     private static String Y_POSITION_SD = "Y Position";
 
@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
         swerve = new Swerve();
         
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
-        SmartDashboard.putNumber(FIELD_SENSITIVE_SD, kDefaultPeriod);
+        SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
     }
        
 
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
         // CommandScheduler.getInstance().run();
 
-        SmartDashboard.putBoolean(FIELD_SENSITIVE_SD, toggleFieldRelative);
+        SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
 
         swerve.periodic();
 
