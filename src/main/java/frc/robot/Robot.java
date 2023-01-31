@@ -24,6 +24,8 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.ctre.phoenix.sensors.CANCoder;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -101,6 +103,7 @@ public class Robot extends TimedRobot {
         double y_position = pose.getY();
         SmartDashboard.putNumber(X_POSITION_SD, x_position);
         SmartDashboard.putNumber(Y_POSITION_SD, y_position);
+        
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
