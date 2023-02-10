@@ -24,7 +24,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.ctre.phoenix.sensors.CANCoder;
+//import com.ctre.phoenix.sensors.CANCoder;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -41,7 +41,8 @@ public class Robot extends TimedRobot {
 
     private boolean toggleFieldRelative = false;
 
-    XboxController controller = new XboxController(0);
+    public XboxController primaryController = new XboxController(0);
+    public XboxController secondaryController = new XboxController(1);
 
     //public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
@@ -110,19 +111,19 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         /* Drive */
-        if (controller.getXButtonPressed()) {
+        if (primaryController.getXButtonPressed()) {
             toggleFieldRelative = !toggleFieldRelative;
         }
 
-        if (controller.getAButtonPressed()) {
+        if (primaryController.getAButtonPressed()) {
             swerve.zeroGyro();
         }
 
-        double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftY()), Constants.stickDeadband);
-        double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getRightX()), Constants.stickDeadband);
+        double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftY()), Constants.stickDeadband);
+        double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getRightX()), Constants.stickDeadband);
         rotationVal *= SmartDashboard.getNumber("Rotation Speed", 1);
 
-        double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(controller.getLeftX()), Constants.stickDeadband);
+        double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftX()), Constants.stickDeadband);
 
         swerve.drive(
                 new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
