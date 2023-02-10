@@ -24,7 +24,6 @@ public class Intake {
     States state = States.OFF;
 
     boolean isCone = false;
-
     boolean beamInterrupted = false;
 
     public Intake(Robot robot) {
@@ -52,9 +51,12 @@ public class Intake {
             if (beamInterrupted) {
                 state = States.HOLD;
             }
+            checkForOuttake();
         } else if (state == States.HOLD) {
             // stops motors without changing claw's open/closed status
             leftWheel.stopMotor();
+            claw.set(isCone);
+            checkForOuttake();
         } else if (state == States.OUTTAKE) {
             // outtakes any game piece being held
             leftWheel.set(-1);
@@ -64,4 +66,11 @@ public class Intake {
             }
         }
     }
+
+    private void checkForOuttake() {
+        if (robot.secondaryController.getBButtonPressed()) {
+            state = States.OUTTAKE;
+        }
+    }
+
 }
