@@ -49,11 +49,9 @@ public class Robot extends TimedRobot {
     //public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
     private static String ROTATION_SPEED_SD = "Rotation Speed";
-    private static String FIELD_RELATIVE_SD = "Field Relative";
-    public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
+    private static String FIELD_RELATIVE_SD = "Field RELATIVE";
 
     private Arm arm = new Arm(this);
-
     private boolean isManual = false;
 
     public boolean isManual() {
