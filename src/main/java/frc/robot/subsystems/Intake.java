@@ -27,6 +27,7 @@ public class Intake {
     States state = States.OFF;
 
     boolean isCone = false;
+    boolean isManual = false;
 
     public Intake(Robot robot) {
         rightWheel.follow(leftWheel, true);
@@ -34,44 +35,60 @@ public class Intake {
     }
 
     public void periodic() {
+        if (robot.secondaryController.getYButtonPressed()) {
+            isManual = true;
+        }
+        
         if (state == States.OFF) {
             // stops motor movement and closes claw
             claw.set(true);
             leftWheel.stopMotor();
+
             // shift to intakes
-            if (robot.secondaryController.getXButtonPressed()) {
-                state = States.INTAKE;
-            }
+            checkForIntake();
         } else if (state == States.INTAKE) {
-            // opens or closes claw based on cube/cone and spins rollers
-            if (robot.secondaryController.getAButtonPressed()) {
-                isCone = !isCone;
-            }
             claw.set(isCone);
-            leftWheel.stopMotor();
+            leftWheel.set(.2);
+
+            // opens or closes claw based on cube/cone and spins rollers
+            checkForIntake();
             // changes to hold once beam brake is interrupted
-            if (!hasNoGamePiece.get()) {
+            if (!hasNoGamePiece.get() && !isManual) {
                 state = States.HOLD;
+            } else if (isManual) {
+                checkForAdvance(States.HOLD);
             }
-            checkForOuttake();
         } else if (state == States.HOLD) {
             // stops motors without changing claw's open/closed status
             leftWheel.stopMotor();
             claw.set(isCone);
-            checkForOuttake();
+            checkForAdvance(States.OUTTAKE);
         } else if (state == States.OUTTAKE) {
             // outtakes any game piece being held
-            leftWheel.set(-1);
+            leftWheel.set(-.2);
             // once the piece isn't sensed the claw is turned "off" 
-            if (hasNoGamePiece.get()) {
+            if (hasNoGamePiece.get() && !isManual) {
                 state = States.OFF;
+            } else if (isManual) {
+                checkForAdvance(States.OFF);
             }
         }
     }
 
-    private void checkForOuttake() {
+    private void checkForIntake() {
+        if (robot.secondaryController.getXButtonPressed()) {
+            isCone = false;
+            state = States.INTAKE;
+        }
+        if (robot.secondaryController.getAButtonPressed()) {
+            isCone = true;
+            state = States.INTAKE;
+        }
+    }
+
+    private void checkForAdvance(States next) {
         if (robot.secondaryController.getBButtonPressed()) {
-            state = States.OUTTAKE;
+            state = next;
         }
     }
 
