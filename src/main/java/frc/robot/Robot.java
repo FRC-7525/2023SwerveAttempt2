@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -50,6 +51,8 @@ public class Robot extends TimedRobot {
     private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_RELATIVE_SD = "Field Relative";
     public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
+
+    private Arm arm = new Arm(this);
 
     private boolean isManual = false;
 
@@ -117,7 +120,7 @@ public class Robot extends TimedRobot {
         if (secondaryController.getYButtonPressed()) {
             isManual = !isManual;
         }
-        
+
         SmartDashboard.putBoolean("isManual", isManual);
 
 
