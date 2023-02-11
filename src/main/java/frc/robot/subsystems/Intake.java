@@ -103,6 +103,7 @@ public class Intake {
         } else if (state == States.OUTTAKE) {
             // outtakes any game piece being held
             leftWheel.set(-.2);
+            
             // once the piece isn't sensed the claw is turned "off" 
             if (hasNoCube.get() && hasNoCone.get() && !robot.isManual()) {
                 state = States.OFF;
