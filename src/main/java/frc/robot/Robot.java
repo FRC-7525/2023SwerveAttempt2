@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.autos.exampleAuto;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -123,17 +124,13 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-
+        CommandScheduler.getInstance().schedule(new exampleAuto(this.swerve));
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        swerve.drive(
-            new Translation2d(1, 0).times(0.45),
-            0,
-            false,
-            false);
+        CommandScheduler.getInstance().run();
     }
 
     @Override
