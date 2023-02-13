@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.lang.Thread.State;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -11,7 +9,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 
-enum States {
+enum IntakeStates {
     OFF,
     INTAKE,
     HOLD,
@@ -27,7 +25,7 @@ public class Intake {
     DigitalInput hasNoCube = new DigitalInput(1);
 
     Robot robot = null;
-    States state = States.OFF;
+    IntakeStates state = IntakeStates.OFF;
 
     boolean isCone = false;
 
@@ -41,7 +39,7 @@ public class Intake {
         SmartDashboard.putBoolean("isCone", isCone);
         String stateString = "";
 
-        if (state == States.OFF) {
+        if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
             claw.set(true);
             leftWheel.stopMotor();
@@ -50,12 +48,12 @@ public class Intake {
             // shift to intakes
             if (robot.secondaryController.getXButtonPressed()) {
                 isCone = false;     
-                state = States.INTAKE;
+                state = IntakeStates.INTAKE;
             } else if (robot.secondaryController.getAButtonPressed()) {
                 isCone = true;
-                state = States.INTAKE;
+                state = IntakeStates.INTAKE;
             }
-        } else if (state == States.INTAKE) {
+        } else if (state == IntakeStates.INTAKE) {
             claw.set(isCone);
             leftWheel.set(.2);
 
@@ -70,28 +68,28 @@ public class Intake {
                 if (isCone) {
                     isCone = false;
                 } else {
-                    state = States.OFF;
+                    state = IntakeStates.OFF;
                 }
             }
             if (robot.secondaryController.getAButtonPressed()) {
                 if (!isCone) {
                     isCone = true;
                 } else {
-                    state = States.OFF;
+                    state = IntakeStates.OFF;
                 }
             }
 
             // changes to hold once beam brake is interrupted
             if (((isCone && !hasNoCone.get()) || (!isCone && !hasNoCube.get())) && !robot.isManual()) {
-                state = States.HOLD;
+                state = IntakeStates.HOLD;
             } else if (robot.isManual()) {
-                checkForAdvance(States.HOLD);
+                checkForAdvance(IntakeStates.HOLD);
             }
-        } else if (state == States.HOLD) {
+        } else if (state == IntakeStates.HOLD) {
             // stops motors without changing claw's open/closed status
             leftWheel.stopMotor();
             claw.set(isCone);
-            checkForAdvance(States.OUTTAKE);
+            checkForAdvance(IntakeStates.OUTTAKE);
 
             if (isCone) {
                 stateString = "Holding Cone";
@@ -100,15 +98,15 @@ public class Intake {
             }
 
 
-        } else if (state == States.OUTTAKE) {
+        } else if (state == IntakeStates.OUTTAKE) {
             // outtakes any game piece being held
             leftWheel.set(-.2);
             
             // once the piece isn't sensed the claw is turned "off" 
             if (hasNoCube.get() && hasNoCone.get() && !robot.isManual()) {
-                state = States.OFF;
+                state = IntakeStates.OFF;
             } else if (robot.isManual()) {
-                checkForAdvance(States.OFF);
+                checkForAdvance(IntakeStates.OFF);
             }
             stateString = "Outaking Gamepiece";
         }
@@ -116,7 +114,7 @@ public class Intake {
         SmartDashboard.putString("Intake State", stateString);
     }
 
-    private void checkForAdvance(States next) {
+    private void checkForAdvance(IntakeStates next) {
         if (robot.secondaryController.getBButtonPressed()) {
             state = next;
         }

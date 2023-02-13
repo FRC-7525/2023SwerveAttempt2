@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -48,6 +50,7 @@ public class Robot extends TimedRobot {
 
     //public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
+    public final Solenoid solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
     private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_RELATIVE_SD = "Field RELATIVE";
 
@@ -83,6 +86,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
+    
+        arm.periodic();
         swerve.periodic();
     }
 

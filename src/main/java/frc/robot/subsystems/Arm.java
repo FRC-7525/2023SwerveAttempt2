@@ -1,25 +1,23 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.ctre.phoenix.motorcontrol.MotorCommutation;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-enum States {
+enum ArmStates {
     OFF,
     ON
 }
 
 public class Arm {
-    CANSparkMax motor = new CANSparkMax(8, MotorType.kBrushless);
+    CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
     SparkMaxPIDController motorPIDcontroller = motor.getPIDController();
     RelativeEncoder motorEncoder = motor.getEncoder();
-    States state = States.OFF;
+    ArmStates state = ArmStates.OFF;
     Robot robot = null;
 
     public Arm(Robot robot) {
@@ -45,19 +43,19 @@ public class Arm {
         SmartDashboard.putNumber("Arm Encoder Position", motorEncoder.getPosition());
         SmartDashboard.putNumber("Arm Encoder Velocity", motorEncoder.getVelocity());
 
-        if (state == States.OFF) {
+        if (state == ArmStates.OFF) {
             // Set position to 0
             motorPIDcontroller.setReference(0, CANSparkMax.ControlType.kSmartMotion);
 
-            if (robot.secondaryController.getLeftBumperPressed()) {
-                state = States.ON;
+            if (robot.primaryController.getLeftBumperPressed()) {
+                state = ArmStates.ON;
             }
-        } else if (state == States.ON) {
+        } else if (state == ArmStates.ON) {
             // Set position to 10000
-            motorPIDcontroller.setReference(1000, CANSparkMax.ControlType.kSmartMotion);
-
-            if (robot.secondaryController.getLeftBumperPressed()) {
-                state = States.OFF; 
+            motorPIDcontroller.setReference(10000, CANSparkMax.ControlType.kSmartMotion);
+ 
+            if (robot.primaryController.getLeftBumperPressed()) {
+                state = ArmStates.OFF; 
             }
         }
     }
