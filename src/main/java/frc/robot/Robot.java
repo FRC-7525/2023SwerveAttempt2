@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autos.exampleAuto;
 import frc.robot.subsystems.Swerve;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.MathUtil;
@@ -52,6 +52,14 @@ public class Robot extends TimedRobot {
     private static String X_POSITION_SD = "X Position";
     private static String Y_POSITION_SD = "Y Position";
 
+    public static String AUTO_TYPE_SD = "Auto Type" ;
+
+
+    private static final String SampleAuto = "SampleAuto";
+    private static final String SampleBlank = "sampleBlank";
+    private String AutoSelected;
+    private final SendableChooser<String> chooser = new SendableChooser<>();
+
     
 
 
@@ -67,6 +75,10 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         ctreConfigs = new CTREConfigs();
         swerve = new Swerve();
+
+        chooser.setDefaultOption(SampleAuto, SampleAuto);
+        chooser.addOption(SampleBlank, SampleBlank);
+        SmartDashboard.putData("Auto choices", chooser);
         
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
@@ -94,7 +106,7 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         // CommandScheduler.getInstance().run();
-
+       
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
 
         swerve.periodic();
@@ -124,13 +136,25 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
+        AutoSelected = chooser.getSelected();
+        System.out.println("Auto selected: " + AutoSelected);
         CommandScheduler.getInstance().schedule(new exampleAuto(this.swerve));
+        switch (AutoSelected) {
+            case SampleAuto:
+            //CommandScheduler.getInstance().run();
+            
+              break;
+            case SampleBlank:
+            default:
+              System.out.print("cats are STUPID");
+              break;
+        }
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        CommandScheduler.getInstance().run();
+        
     }
 
     @Override
