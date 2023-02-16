@@ -47,11 +47,19 @@ public class Intake {
             stateString = "Off";
             // shift to intakes
             if (robot.secondaryController.getXButtonPressed()) {
-                isCone = false;     
-                state = IntakeStates.INTAKE;
+                if (robot.secondaryController.getLeftBumper()) {
+                    robot.rgb.setState(RGBStates.Cube);
+                } else {
+                    isCone = false;
+                    state = IntakeStates.INTAKE;
+                }
             } else if (robot.secondaryController.getAButtonPressed()) {
-                isCone = true;
-                state = IntakeStates.INTAKE;
+                if (robot.secondaryController.getLeftBumper()) {
+                    robot.rgb.setState(RGBStates.Cone);
+                } else {
+                    isCone = true;
+                    state = IntakeStates.INTAKE;
+                }
             }
         } else if (state == IntakeStates.INTAKE) {
             claw.set(isCone);
@@ -59,8 +67,10 @@ public class Intake {
 
             if (isCone) {
                 stateString = "Intaking Cone";
+                robot.rgb.setState(RGBStates.Cone);
             } else {
                 stateString = "Intaking Cube";
+                robot.rgb.setState(RGBStates.Cube);
             }
 
             // opens or closes claw based on cube/cone and spins rollers
@@ -93,14 +103,15 @@ public class Intake {
 
             if (isCone) {
                 stateString = "Holding Cone";
+                robot.rgb.setState(RGBStates.Cone);
             } else {
                 stateString = "Holding Cube";
+                robot.rgb.setState(RGBStates.Cube); 
             }
-
-
         } else if (state == IntakeStates.OUTTAKE) {
             // outtakes any game piece being held
             leftWheel.set(-.2);
+            robot.rgb.setState(RGBStates.Neutral);
             
             // once the piece isn't sensed the claw is turned "off" 
             if (hasNoCube.get() && hasNoCone.get() && !robot.isManual()) {

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -56,6 +57,8 @@ public class Robot extends TimedRobot {
 
     private Arm arm = new Arm(this);
     private boolean isManual = false;
+
+    public RGB rgb = new RGB(this);
 
     public boolean isManual() {
         return isManual;
