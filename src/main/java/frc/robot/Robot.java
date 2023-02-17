@@ -36,23 +36,17 @@ import com.ctre.phoenix.sensors.CANCoder;
  * project.
  */
 public class Robot extends TimedRobot {
-    public static CTREConfigs ctreConfigs;
+    public static CTREConfigs ctreConfigs = new CTREConfigs();
+    private Swerve swerve = new Swerve();
 
-    private Swerve swerve;
-
-    private boolean toggleFieldRelative;
+    private boolean toggleFieldRelative = false;
 
     XboxController controller = new XboxController(0);
 
-    public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
+    //public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
-    private static String ROTATION_SPEED_SD = "Roation Speed";
-    private static String FIELD_RELATIVE_SD = "Field RELATIVE";
-    private static String X_POSITION_SD = "X Position";
-    private static String Y_POSITION_SD = "Y Position";
-
-    
-
+    private static String ROTATION_SPEED_SD = "Rotation Speed";
+    private static String FIELD_RELATIVE_SD = "Field Relative";
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -60,18 +54,11 @@ public class Robot extends TimedRobot {
      * initialization code.
      */
     @Override
-    public void robotInit() {
-        // Instantiate our RobotContainer. This will perform all our button bindings,
-        // and put our
-        // autonomous chooser on the dashboard.
-        ctreConfigs = new CTREConfigs();
-        swerve = new Swerve();
-        
+    public void robotInit() {        
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
     }
-       
-
+    
     /**
      * This function is called every robot packet, no matter the mode. Use this for
      * items like
@@ -85,25 +72,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        // Runs the Scheduler. This is responsible for polling buttons, adding
-        // newly-scheduled
-        // commands, running already-scheduled commands, removing finished or
-        // interrupted commands,
-        // and running subsystem periodic() methods. This must be called from the
-        // robot's periodic
-        // block in order for anything in the Command-based framework to work.
-        // CommandScheduler.getInstance().run();
-
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
-
         swerve.periodic();
-
-        Pose2d pose = swerve.getPose();
-        double x_position = pose.getX();
-        double y_position = pose.getY();
-        SmartDashboard.putNumber(X_POSITION_SD, x_position);
-        SmartDashboard.putNumber(Y_POSITION_SD, y_position);
-        
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -129,16 +99,11 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        swerve.drive(
-            new Translation2d(1, 0).times(0.45),
-            0,
-            false,
-            false);
+    
     }
 
     @Override
     public void teleopInit() {
-
     }
 
     /** This function is called periodically during operator control. */
@@ -167,6 +132,7 @@ public class Robot extends TimedRobot {
 
         
         /* Vision */
+        /* 
         PhotonPipelineResult result = camera.getLatestResult();
         List<PhotonTrackedTarget> targets = result.getTargets();
 
@@ -177,12 +143,11 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putBoolean("Has Target", !targets.isEmpty());
         SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
+        */
     }
 
     @Override
     public void testInit() {
-        // Cancels all running commands at the start of test mode.
-        CommandScheduler.getInstance().cancelAll();
     }
 
     /** This function is called periodically during test mode. */
