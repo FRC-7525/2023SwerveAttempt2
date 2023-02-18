@@ -35,7 +35,7 @@ public class RGB {
         } else if (state == RGBStates.Cube) {
             RGBcontrol.set(0.89);
         } else if (state == RGBStates.Neutral) {
-            RGBcontrol.set(0.99);
+            RGBcontrol.set(0.63);
         }
     }
 }

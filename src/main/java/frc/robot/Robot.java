@@ -54,7 +54,6 @@ public class Robot extends TimedRobot {
     public final Solenoid solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
     private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_RELATIVE_SD = "Field RELATIVE";
-
     private Arm arm = new Arm(this);
     private boolean isManual = false;
 
@@ -63,6 +62,7 @@ public class Robot extends TimedRobot {
     public boolean isManual() {
         return isManual;
     }
+        
 
     /**
      * This function is run when the robot is first started up and should be used

@@ -46,15 +46,15 @@ public class Intake {
 
             stateString = "Off";
             // shift to intakes
-            if (robot.secondaryController.getXButtonPressed()) {
-                if (robot.secondaryController.getLeftBumper()) {
+            if (robot.secondaryController.getYButtonPressed()) {
+                if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cube);
                 } else {
                     isCone = false;
                     state = IntakeStates.INTAKE;
                 }
             } else if (robot.secondaryController.getAButtonPressed()) {
-                if (robot.secondaryController.getLeftBumper()) {
+                if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cone);
                 } else {
                     isCone = true;
@@ -74,7 +74,7 @@ public class Intake {
             }
 
             // opens or closes claw based on cube/cone and spins rollers
-            if (robot.secondaryController.getXButtonPressed()) {
+            if (robot.secondaryController.getYButtonPressed()) {
                 if (isCone) {
                     isCone = false;
                 } else {
