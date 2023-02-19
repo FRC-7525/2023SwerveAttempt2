@@ -21,11 +21,12 @@ public class Intake {
     CANSparkMax rightWheel = new CANSparkMax(10, MotorType.kBrushless);
     Solenoid claw = new Solenoid(PneumaticsModuleType.REVPH, 1);
 
-    DigitalInput hasNoCone = new DigitalInput(0);
-    DigitalInput hasNoCube = new DigitalInput(1);
+    DigitalInput hasNoCone = new DigitalInput(1);
+    DigitalInput hasNoCube = new DigitalInput(2);
 
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
+    private final double intakeSpeed = -0.2;
 
     boolean isCone = false;
 
@@ -35,14 +36,16 @@ public class Intake {
     }
 
     public void periodic() {
-
-        SmartDashboard.putBoolean("isCone", isCone);
+        SmartDashboard.putBoolean("Is Cone?", isCone);
+        claw.set(isCone);
+        SmartDashboard.putBoolean("Solenoid Status", claw.get());
         String stateString = "";
 
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
-            claw.set(true);
             leftWheel.stopMotor();
+            robot.rgb.setState(RGBStates.Neutral);
+            robot.arm.setState(ArmSetStates.OFF);
 
             stateString = "Off";
             // shift to intakes
@@ -62,15 +65,17 @@ public class Intake {
                 }
             }
         } else if (state == IntakeStates.INTAKE) {
-            claw.set(isCone);
-            leftWheel.set(.2);
+            leftWheel.set(intakeSpeed);
+            System.out.println("in intake state");
 
             if (isCone) {
                 stateString = "Intaking Cone";
                 robot.rgb.setState(RGBStates.Cone);
+                robot.arm.setState(ArmSetStates.CONE_ON);
             } else {
                 stateString = "Intaking Cube";
                 robot.rgb.setState(RGBStates.Cube);
+                robot.arm.setState(ArmSetStates.CUBE_ON);
             }
 
             // opens or closes claw based on cube/cone and spins rollers
@@ -80,8 +85,7 @@ public class Intake {
                 } else {
                     state = IntakeStates.OFF;
                 }
-            }
-            if (robot.secondaryController.getAButtonPressed()) {
+            } else if (robot.secondaryController.getAButtonPressed()) {
                 if (!isCone) {
                     isCone = true;
                 } else {
@@ -91,15 +95,17 @@ public class Intake {
 
             // changes to hold once beam brake is interrupted
             if (((isCone && !hasNoCone.get()) || (!isCone && !hasNoCube.get())) && !robot.isManual()) {
+                System.out.println("auto transition");
                 state = IntakeStates.HOLD;
             } else if (robot.isManual()) {
+                System.out.println("Check manual transition");
                 checkForAdvance(IntakeStates.HOLD);
             }
         } else if (state == IntakeStates.HOLD) {
             // stops motors without changing claw's open/closed status
             leftWheel.stopMotor();
-            claw.set(isCone);
             checkForAdvance(IntakeStates.OUTTAKE);
+            robot.arm.setState(ArmSetStates.OFF);
 
             if (isCone) {
                 stateString = "Holding Cone";
@@ -110,7 +116,7 @@ public class Intake {
             }
         } else if (state == IntakeStates.OUTTAKE) {
             // outtakes any game piece being held
-            leftWheel.set(-.2);
+            leftWheel.set(-intakeSpeed);
             robot.rgb.setState(RGBStates.Neutral);
             
             // once the piece isn't sensed the claw is turned "off" 

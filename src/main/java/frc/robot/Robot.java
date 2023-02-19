@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
 
@@ -51,19 +54,21 @@ public class Robot extends TimedRobot {
 
     //public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
 
-    public final Solenoid solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
     private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_RELATIVE_SD = "Field RELATIVE";
-    private Arm arm = new Arm(this);
+    //private Arm arm = new Arm(this);
     private boolean isManual = false;
 
     public RGB rgb = new RGB(this);
+    public Intake intake = new Intake(this);
+    public PneumaticHub ph = new PneumaticHub();
+    public Arm arm = new Arm(this);
+    public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
     public boolean isManual() {
         return isManual;
     }
-        
-
+    
     /**
      * This function is run when the robot is first started up and should be used
      * for any
@@ -73,6 +78,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {        
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
+
     }
     
     /**
@@ -88,10 +94,15 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
+        compressor.enableAnalog(80, 120);
+        ph.enableCompressorAnalog(80, 120);
+        System.out.println("PRESSURE: " + compressor.getPressure());
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
-    
+        
         arm.periodic();
+        intake.periodic();
         swerve.periodic();
+        rgb.periodic();
     }
 
 
@@ -123,11 +134,11 @@ public class Robot extends TimedRobot {
      * @return */
     @Override
     public void teleopPeriodic() {
-        if (secondaryController.getYButtonPressed()) {
+        if (secondaryController.getRightBumperPressed()) {
             isManual = !isManual;
         }
 
-        SmartDashboard.putBoolean("isManual", isManual);
+        SmartDashboard.putBoolean("Manual Mode", isManual);
 
 
         /* Drive */
