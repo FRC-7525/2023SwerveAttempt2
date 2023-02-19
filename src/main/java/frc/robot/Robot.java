@@ -24,6 +24,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+
 //import com.ctre.phoenix.sensors.CANCoder;
 
 /**
@@ -48,6 +49,13 @@ public class Robot extends TimedRobot {
 
     private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_RELATIVE_SD = "Field Relative";
+    public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
+
+    private boolean isManual = false;
+
+    public boolean isManual() {
+        return isManual;
+    }
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -77,11 +85,6 @@ public class Robot extends TimedRobot {
         swerve.periodic();
     }
 
-    /** This function is called once each time the robot enters Disabled mode. */
-    @Override
-    public void disabledInit() {
-
-    }
 
     @Override
     public void disabledPeriodic() {
@@ -107,9 +110,17 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
     }
 
-    /** This function is called periodically during operator control. */
+    /** This function is called periodically during operator control. 
+     * @return */
     @Override
     public void teleopPeriodic() {
+        if (secondaryController.getYButtonPressed()) {
+            isManual = !isManual;
+        }
+        
+        SmartDashboard.putBoolean("isManual", isManual);
+
+
         /* Drive */
         if (primaryController.getXButtonPressed()) {
             toggleFieldRelative = !toggleFieldRelative;
