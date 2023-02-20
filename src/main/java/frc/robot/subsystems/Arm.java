@@ -57,11 +57,12 @@ public class Arm {
             arm.set(false);
         } else if (state == ArmStates.CUBE_ON) {
             // Set position to high
-            setpoint = 0.7;
+            setpoint = 0.75;
             arm.set(false);
         } else if (state == ArmStates.CONE_ON) {
             arm.set(true);
             setpoint = 0.62;
+            robot.floor
         } else if (state == ArmStates.TURNING_OFF) {
             setpoint = 0.75;
             arm.set(false);

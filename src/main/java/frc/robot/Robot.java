@@ -7,12 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
@@ -20,19 +19,8 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-//import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
-
-//import com.ctre.phoenix.sensors.CANCoder;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -59,6 +47,7 @@ public class Robot extends TimedRobot {
     //private Arm arm = new Arm(this);
     private boolean isManual = false;
 
+    public FloorIntake floorIntake = new FloorIntake(this);
     public RGB rgb = new RGB(this);
     public Intake intake = new Intake(this);
     public PneumaticHub ph = new PneumaticHub();
@@ -66,7 +55,7 @@ public class Robot extends TimedRobot {
     public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
     public boolean isManual() {
-        return isManual;
+        return true;
     }
     
     /**
@@ -96,13 +85,13 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         compressor.enableAnalog(80, 120);
         ph.enableCompressorAnalog(80, 120);
-        System.out.println("PRESSURE: " + compressor.getPressure());
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         
         arm.periodic();
         intake.periodic();
         swerve.periodic();
         rgb.periodic();
+        
     }
 
 
@@ -138,7 +127,7 @@ public class Robot extends TimedRobot {
             isManual = !isManual;
         }
 
-        SmartDashboard.putBoolean("Manual Mode", isManual);
+        SmartDashboard.putBoolean("Manual Mode", this.isManual());
 
 
         /* Drive */
