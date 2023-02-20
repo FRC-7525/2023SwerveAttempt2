@@ -30,6 +30,7 @@ enum ArmSetStates {
 }
 
 public class Arm {
+    private String stateString;
     CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
     Solenoid arm = new Solenoid(PneumaticsModuleType.REVPH, 0);
     PIDController controller = new PIDController(4, 0, 0);
@@ -57,20 +58,24 @@ public class Arm {
             // Set position to low
             setpoint = 0.8;
             arm.set(false);
+            stateString = "Off";
             robot.floorIntake.setState(FloorIntakeStates.OFF);
         } else if (state == ArmStates.CUBE_ON) {
             // Set position to high
             setpoint = 0.77;
             arm.set(false);
+            stateString = "Intaking Cube";
             robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.CONE_ON) {
             arm.set(true);
             setpoint = 0.62;
+            stateString = "Intaking Cone";
             robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.TURNING_OFF) {
             turningOffTimer.start();
             setpoint = 0.75;
             arm.set(false);
+            stateString = "Arm Resetting (for safety)";
             robot.floorIntake.setState(FloorIntakeStates.ON);
             if (turningOffTimer.get() > 2) {
                 state = ArmStates.OFF;
@@ -80,6 +85,7 @@ public class Arm {
         } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE) {
             floorTimer.start();
             setpoint = 0.8;
+            stateString = "Moving Floor Intake (pre-Cone Intake)";
             robot.floorIntake.setState(FloorIntakeStates.ON);
 
             if (floorTimer.get() > 1) {
@@ -89,6 +95,7 @@ public class Arm {
             }
         }
 
+        SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
     }
 

@@ -15,6 +15,7 @@ enum RGBStates {
 }
 
 public class RGB {
+    private String stateString;
     Spark RGBcontrol = new Spark(0);
     Robot robot = null;
 
@@ -32,11 +33,16 @@ public class RGB {
     public void periodic() {
         if (state == RGBStates.Cone) {
             RGBcontrol.set(0.69);
+            stateString = "Cone";
         } else if (state == RGBStates.Cube) {
             RGBcontrol.set(0.89);
+            stateString = "Cube";
         } else if (state == RGBStates.Neutral) {
+            stateString = "Neutral";
             RGBcontrol.set(0.99);
         }
+
+        SmartDashboard.putString("RGB State", stateString);
     }
 }
 
