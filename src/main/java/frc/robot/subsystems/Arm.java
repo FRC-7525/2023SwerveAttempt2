@@ -19,7 +19,8 @@ enum ArmStates {
     OFF,
     CUBE_ON,
     CONE_ON,
-    TURNING_OFF
+    TURNING_OFF,
+    WAITING_FOR_FLOOR_INTAKE
 }
 
 enum ArmSetStates {
@@ -34,9 +35,10 @@ public class Arm {
     PIDController controller = new PIDController(4, 0, 0);
     DutyCycleEncoder encoder = new DutyCycleEncoder(0);
     ArmStates state = ArmStates.OFF;
-    Timer timer = new Timer();
+    Timer turningOffTimer = new Timer();
+    Timer floorTimer = new Timer();
     Robot robot = null;
-    double setpoint = 0.72;
+    double setpoint = 0.8;
 
     public Arm(Robot robot) {
         this.robot = robot;
@@ -55,19 +57,35 @@ public class Arm {
             // Set position to low
             setpoint = 0.8;
             arm.set(false);
+            robot.floorIntake.setState(FloorIntakeStates.OFF);
         } else if (state == ArmStates.CUBE_ON) {
             // Set position to high
-            setpoint = 0.75;
+            setpoint = 0.77;
             arm.set(false);
+            robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.CONE_ON) {
             arm.set(true);
             setpoint = 0.62;
-            robot.floor
+            robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.TURNING_OFF) {
+            turningOffTimer.start();
             setpoint = 0.75;
             arm.set(false);
-            if (timer.get() > 2) {
+            robot.floorIntake.setState(FloorIntakeStates.ON);
+            if (turningOffTimer.get() > 2) {
                 state = ArmStates.OFF;
+                turningOffTimer.reset();
+                turningOffTimer.stop();
+            }
+        } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE) {
+            floorTimer.start();
+            setpoint = 0.8;
+            robot.floorIntake.setState(FloorIntakeStates.ON);
+
+            if (floorTimer.get() > 1) {
+                state = ArmStates.CONE_ON;
+                floorTimer.reset();
+                floorTimer.stop();
             }
         }
 
@@ -75,16 +93,23 @@ public class Arm {
     }
 
     public void setState(ArmSetStates state) {
-        if (this.state == ArmStates.OFF || this.state == ArmStates.CUBE_ON) {
+        if (this.state == ArmStates.OFF) {
+            if (state == ArmSetStates.CONE_ON) {
+                floorTimer.reset();
+                this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+            }
+            if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
+        } else if (this.state == ArmStates.CUBE_ON) {
             if (state == ArmSetStates.OFF) this.state = ArmStates.OFF;
             if (state == ArmSetStates.CONE_ON) this.state = ArmStates.CONE_ON;
-            if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
         } else if (this.state == ArmStates.TURNING_OFF) {
             if (state == ArmSetStates.CONE_ON) this.state = ArmStates.CONE_ON;
             if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
         } else if (this.state == ArmStates.CONE_ON) {
-            if (state == ArmSetStates.OFF) this.state = ArmStates.TURNING_OFF;
-            if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.TURNING_OFF;
+            if (state == ArmSetStates.OFF || state == ArmSetStates.CUBE_ON) {
+                turningOffTimer.reset();
+                this.state = ArmStates.TURNING_OFF;
+            }
         }
     }
 }
