@@ -20,13 +20,15 @@ enum ArmStates {
     CUBE_ON,
     CONE_ON,
     TURNING_OFF,
-    WAITING_FOR_FLOOR_INTAKE
+    WAITING_FOR_FLOOR_INTAKE,
+    LEVEL_ONE
 }
 
 enum ArmSetStates {
     OFF,
     CUBE_ON,
-    CONE_ON
+    CONE_ON,
+    LEVEL_ONE
 }
 
 public class Arm {
@@ -36,6 +38,7 @@ public class Arm {
     PIDController controller = new PIDController(4, 0, 0);
     DutyCycleEncoder encoder = new DutyCycleEncoder(0);
     ArmStates state = ArmStates.OFF;
+    ArmStates nextState = ArmStates.OFF;
     Timer turningOffTimer = new Timer();
     Timer floorTimer = new Timer();
     Robot robot = null;
@@ -53,6 +56,9 @@ public class Arm {
     public void periodic() {
         // Put encoder value on SmartDashboard
         SmartDashboard.putNumber("Arm Encoder Position", encoder.getAbsolutePosition());
+        SmartDashboard.putBoolean("NearSetpoint", this.nearSetpoint());
+        SmartDashboard.putBoolean("WaitingForFloorIntake", this.waitingForFloorIntake());
+
 
         if (state == ArmStates.OFF) {
             // Set position to low
@@ -62,7 +68,7 @@ public class Arm {
             robot.floorIntake.setState(FloorIntakeStates.OFF);
         } else if (state == ArmStates.CUBE_ON) {
             // Set position to high
-            setpoint = 0.77;
+            setpoint = 0.745;
             arm.set(false);
             stateString = "Intaking Cube";
             robot.floorIntake.setState(FloorIntakeStates.ON);
@@ -73,14 +79,15 @@ public class Arm {
             robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.TURNING_OFF) {
             turningOffTimer.start();
-            setpoint = 0.75;
             arm.set(false);
             stateString = "Arm Resetting (for safety)";
             robot.floorIntake.setState(FloorIntakeStates.ON);
-            if (turningOffTimer.get() > 2) {
+            if (turningOffTimer.get() > 3) {
                 state = ArmStates.OFF;
                 turningOffTimer.reset();
                 turningOffTimer.stop();
+            } else if (turningOffTimer.get() > 2) {
+                setpoint = 0.8;
             }
         } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE) {
             floorTimer.start();
@@ -89,14 +96,26 @@ public class Arm {
             robot.floorIntake.setState(FloorIntakeStates.ON);
 
             if (floorTimer.get() > 1) {
-                state = ArmStates.CONE_ON;
+                state = nextState;
                 floorTimer.reset();
                 floorTimer.stop();
             }
+        } else if (state == ArmStates.LEVEL_ONE) {
+            stateString = "Level One Scoring";
+            setpoint = 0.7;
+            robot.floorIntake.setState(FloorIntakeStates.ON);
         }
 
         SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
+    }
+
+    public boolean nearSetpoint() {
+        return Math.abs(encoder.getAbsolutePosition() - setpoint) < 0.02;
+    }
+
+    public boolean waitingForFloorIntake() {
+        return state == ArmStates.WAITING_FOR_FLOOR_INTAKE;
     }
 
     public void setState(ArmSetStates state) {
@@ -104,6 +123,12 @@ public class Arm {
             if (state == ArmSetStates.CONE_ON) {
                 floorTimer.reset();
                 this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                this.nextState = ArmStates.CONE_ON;
+            }
+            if (state == ArmSetStates.LEVEL_ONE) {
+                floorTimer.reset();
+                this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                this.nextState = ArmStates.LEVEL_ONE;
             }
             if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
         } else if (this.state == ArmStates.CUBE_ON) {
@@ -116,6 +141,14 @@ public class Arm {
             if (state == ArmSetStates.OFF || state == ArmSetStates.CUBE_ON) {
                 turningOffTimer.reset();
                 this.state = ArmStates.TURNING_OFF;
+            }
+        } else if (this.state == ArmStates.LEVEL_ONE) {
+            if (state == ArmSetStates.OFF) {
+                if (robot.intake.isCone()) {
+                    this.state = ArmStates.TURNING_OFF;
+                } else {
+                    this.state = ArmStates.OFF;
+                }
             }
         }
     }

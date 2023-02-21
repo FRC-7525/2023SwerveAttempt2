@@ -1,9 +1,14 @@
 package frc.robot.subsystems;
 
+import javax.print.attribute.standard.Compression;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +33,7 @@ public class Intake {
     IntakeStates state = IntakeStates.OFF;
     private final double intakeSpeed = -0.2;
 
-    boolean isCone = false;
+    private boolean isCone = false;
 
     public Intake(Robot robot) {
         rightWheel.follow(leftWheel, true);
@@ -40,6 +45,7 @@ public class Intake {
         claw.set(isCone);
         SmartDashboard.putBoolean("Solenoid Status", claw.get());
         String stateString = "";
+        
 
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
@@ -103,7 +109,7 @@ public class Intake {
             }
         } else if (state == IntakeStates.HOLD) {
             // stops motors without changing claw's open/closed status
-            leftWheel.stopMotor();
+            leftWheel.set(-0.05);
             checkForAdvance(IntakeStates.OUTTAKE);
             robot.arm.setState(ArmSetStates.OFF);
 
@@ -115,9 +121,14 @@ public class Intake {
                 robot.rgb.setState(RGBStates.Cube); 
             }
         } else if (state == IntakeStates.OUTTAKE) {
-            // outtakes any game piece being held
-            leftWheel.set(-intakeSpeed);
-            robot.rgb.setState(RGBStates.Neutral);
+            robot.arm.setState(ArmSetStates.LEVEL_ONE);
+            if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
+                // outtakes any game piece being held
+                leftWheel.set(-intakeSpeed);
+                robot.rgb.setState(RGBStates.Neutral);
+            } else {
+                leftWheel.set(0);
+            }
             
             // once the piece isn't sensed the claw is turned "off" 
             if (hasNoCube.get() && hasNoCone.get() && !robot.isManual()) {
@@ -135,5 +146,9 @@ public class Intake {
         if (robot.secondaryController.getBButtonPressed()) {
             state = next;
         }
+    }
+
+    public boolean isCone() {
+        return this.isCone;
     }
 }

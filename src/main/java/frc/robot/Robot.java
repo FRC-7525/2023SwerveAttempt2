@@ -86,12 +86,14 @@ public class Robot extends TimedRobot {
         compressor.enableAnalog(80, 120);
         ph.enableCompressorAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
+
+        SmartDashboard.putNumber("Pressure", compressor.getPressure());
         
         arm.periodic();
         intake.periodic();
         swerve.periodic();
         rgb.periodic();
-        
+        floorIntake.periodic();
     }
 
 

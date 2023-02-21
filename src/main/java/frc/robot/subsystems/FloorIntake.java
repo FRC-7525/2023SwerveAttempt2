@@ -33,7 +33,7 @@ public class FloorIntake {
         } else if (state == FloorIntakeStates.ON) {
             stateString = "On";
             solenoid.set(true);
-            motor.set(0.355);
+            motor.set(0.45);
         }
 
         SmartDashboard.putString("Floor Intake State", stateString);
