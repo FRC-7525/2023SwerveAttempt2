@@ -21,6 +21,12 @@ enum IntakeStates {
     OUTTAKE
 }
 
+enum ButtonLevelStates {
+    OFF,
+    LEVEL_ONE,
+    LEVEL_TWO
+}
+
 public class Intake {
     CANSparkMax leftWheel = new CANSparkMax(11, MotorType.kBrushless);
     CANSparkMax rightWheel = new CANSparkMax(10, MotorType.kBrushless);
@@ -31,6 +37,8 @@ public class Intake {
 
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
+    ButtonLevelStates buttonLevelStates = ButtonLevelStates.OFF;
+
     private final double intakeSpeed = -0.2;
 
     private boolean isCone = false;
@@ -120,7 +128,7 @@ public class Intake {
                 stateString = "Holding Cube";
                 robot.rgb.setState(RGBStates.Cube); 
             }
-        } else if (state == IntakeStates.OUTTAKE) {
+        } else if (state == IntakeStates.OUTTAKE && buttonLevelStates == ButtonLevelStates.LEVEL_ONE) {
             robot.arm.setState(ArmSetStates.LEVEL_ONE);
             if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                 // outtakes any game piece being held
@@ -136,8 +144,24 @@ public class Intake {
             } else if (robot.isManual()) {
                 checkForAdvance(IntakeStates.OFF);
             }
-            stateString = "Outaking Gamepiece";
-        }
+            stateString = "Outaking Gamepiece Level One";
+        } else if (state == IntakeStates.OUTTAKE && buttonLevelStates == ButtonLevelStates.LEVEL_TWO) {
+            robot.arm.setState(ArmSetStates.LEVEL_TWO);
+            if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
+                // outtakes any game piece being held
+                leftWheel.set(-intakeSpeed);
+                robot.rgb.setState(RGBStates.Neutral);
+            } else {
+                leftWheel.set(0);
+            }
+            
+            // once the piece isn't sensed the claw is turned "off" 
+            if (hasNoCube.get() && hasNoCone.get() && !robot.isManual()) {
+                state = IntakeStates.OFF;
+            } else if (robot.isManual()) {
+                checkForAdvance(IntakeStates.OFF);
+            }
+            stateString = "Outaking Gamepiece Level Two";
 
         SmartDashboard.putString("Intake State", stateString);
     }
