@@ -21,14 +21,16 @@ enum ArmStates {
     CONE_ON,
     TURNING_OFF,
     WAITING_FOR_FLOOR_INTAKE,
-    LEVEL_ONE
+    LEVEL_ONE,
+    LEVEL_TWO
 }
 
 enum ArmSetStates {
     OFF,
     CUBE_ON,
     CONE_ON,
-    LEVEL_ONE
+    LEVEL_ONE,
+    LEVEL_TWO
 }
 
 public class Arm {
@@ -104,7 +106,13 @@ public class Arm {
             stateString = "Level One Scoring";
             setpoint = 0.7;
             robot.floorIntake.setState(FloorIntakeStates.ON);
+        } else if (state == ArmStates.LEVEL_TWO) {
+            stateString = "Level Two Scoring";
+            setpoint = 0.65;
+            robot.floorIntake.setState(FloorIntakeStates.On);
         }
+
+        
 
         SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
@@ -130,6 +138,11 @@ public class Arm {
                 this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
                 this.nextState = ArmStates.LEVEL_ONE;
             }
+            if (state == ArmSetStates.LEVEL_TWO) {
+                floorTimer.reset();
+                this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                this.nextState = ArmStates.LEVEL_TWO;
+            }
             if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
         } else if (this.state == ArmStates.CUBE_ON) {
             if (state == ArmSetStates.OFF) this.state = ArmStates.OFF;
@@ -143,6 +156,14 @@ public class Arm {
                 this.state = ArmStates.TURNING_OFF;
             }
         } else if (this.state == ArmStates.LEVEL_ONE) {
+            if (state == ArmSetStates.OFF) {
+                if (robot.intake.isCone()) {
+                    this.state = ArmStates.TURNING_OFF;
+                } else {
+                    this.state = ArmStates.OFF;
+                }
+            }
+        }  else if (this.state == ArmStates.LEVEL_TWO) {
             if (state == ArmSetStates.OFF) {
                 if (robot.intake.isCone()) {
                     this.state = ArmStates.TURNING_OFF;
