@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.lang.System.Logger.Level;
+
 import javax.print.attribute.standard.Compression;
 
 import com.revrobotics.CANSparkMax;
@@ -32,11 +34,12 @@ public class Intake {
     CANSparkMax rightWheel = new CANSparkMax(10, MotorType.kBrushless);
     Solenoid claw = new Solenoid(PneumaticsModuleType.REVPH, 1);
 
-    DigitalInput hasNoCone = new DigitalInput(1);
-    DigitalInput hasNoCube = new DigitalInput(2);
+    DigitalInput InfraredDistanceSensor = new DigitalInput(1);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
 
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
+    Level 
     private final double intakeSpeed = -0.2;
 
     private boolean isCone = false;
@@ -110,7 +113,7 @@ public class Intake {
             }
 
             // changes to hold once beam brake is interrupted
-            if (((isCone && !hasNoCone.get()) || (!isCone && !hasNoCube.get())) && !robot.isManual()) {
+            if ((!InfraredDistanceSensor.get()) && !robot.isManual()) {
                 System.out.println("auto transition");
                 state = IntakeStates.HOLD;
             } else if (robot.isManual()) {

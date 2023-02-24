@@ -20,7 +20,6 @@ enum ArmStates {
     CUBE_ON,
     CONE_ON,
     TURNING_OFF,
-    WAITING_FOR_FLOOR_INTAKE,
     LEVEL_ONE,
     LEVEL_TWO
 }
@@ -164,6 +163,16 @@ public class Arm {
                 }
             }
         }  else if (this.state == ArmStates.LEVEL_TWO) {
+gOffTimer.reset();
+                this.state = ArmStates.TURNING_OFF;
+            }
+        } else if (this.state == ArmStates.LEVEL_ONE) {
+             this.state = ArmStates.TURNING_OFF;
+            }
+        } else if (this.state == ArmStates.LEVEL_ONE) {
+             this.state = ArmStates.TURNING_OFF;
+            }
+        } else if (this.state == ArmStates.LEVEL_ONE) {
             if (state == ArmSetStates.OFF) {
                 if (robot.intake.isCone()) {
                     this.state = ArmStates.TURNING_OFF;
