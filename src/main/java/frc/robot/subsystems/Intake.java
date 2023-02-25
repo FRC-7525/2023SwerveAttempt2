@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.lang.System.Logger.Level;
-
 import javax.print.attribute.standard.Compression;
 
 import com.revrobotics.CANSparkMax;
@@ -34,12 +32,12 @@ public class Intake {
     CANSparkMax rightWheel = new CANSparkMax(10, MotorType.kBrushless);
     Solenoid claw = new Solenoid(PneumaticsModuleType.REVPH, 1);
 
-    DigitalInput InfraredDistanceSensor = new DigitalInput(1);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+    DigitalInput hasNoObject = new DigitalInput(1);
 
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
-    Level 
+    ButtonLevelStates level = ButtonLevelStates.OFF;
+
     private final double intakeSpeed = -0.2;
 
     private boolean isCone = false;
@@ -113,7 +111,7 @@ public class Intake {
             }
 
             // changes to hold once beam brake is interrupted
-            if ((!InfraredDistanceSensor.get()) && !robot.isManual()) {
+            if (((!isCone && !hasNoObject.get())) && !robot.isManual()) {
                 System.out.println("auto transition");
                 state = IntakeStates.HOLD;
             } else if (robot.isManual()) {
@@ -156,15 +154,17 @@ public class Intake {
             }
             
             // once the piece isn't sensed the claw is turned "off" 
-            if (hasNoCube.get() && hasNoCone.get() && !robot.isManual()) {
+            if (hasNoObject.get() && !robot.isManual()) {
                 state = IntakeStates.OFF;
             } else if (robot.isManual()) {
                 checkForAdvance(IntakeStates.OFF);
-            }
-            stateString = "Outaking Gamepiece";
+            } else {
+                leftWheel.set(0);
+            } 
+            
         }
-
         SmartDashboard.putString("Intake State", stateString);
+    }
     
 
     private void checkForAdvance(IntakeStates next) {
