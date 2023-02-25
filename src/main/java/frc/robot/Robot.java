@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
 
         double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftY()), Constants.stickDeadband);
         double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getRightX()), Constants.stickDeadband);
-        rotationVal *= SmartDashboard.getNumber("Rotation Speed", 1);
+        rotationVal += translationVal * 0.01;
 
         double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftX()), Constants.stickDeadband);
 
