@@ -1,14 +1,9 @@
 package frc.robot.subsystems;
 
-import javax.print.attribute.standard.Compression;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -56,6 +51,7 @@ public class Intake {
 
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
+            System.out.println("intake off");
             leftWheel.stopMotor();
             robot.rgb.setState(RGBStates.Neutral);
             robot.arm.setState(ArmSetStates.OFF);
@@ -63,6 +59,7 @@ public class Intake {
             stateString = "Off";
             // shift to intakes
             if (robot.secondaryController.getYButtonPressed()) {
+                System.out.println("y button pressed (switching to cube intake)");
                 if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cube);
                 } else {
@@ -70,6 +67,7 @@ public class Intake {
                     state = IntakeStates.INTAKE;
                 }
             } else if (robot.secondaryController.getAButtonPressed()) {
+                System.out.println("a button pressed (switching to cone intake)");
                 if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cone);
                 } else {

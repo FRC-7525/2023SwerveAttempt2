@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -9,10 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 enum ArmStates {
@@ -52,7 +49,12 @@ public class Arm {
     }
 
     private void toSetpoint() {
-        motor.set(controller.calculate(encoder.getAbsolutePosition(), setpoint));
+        if (encoder.getAbsolutePosition() != 0) {
+            motor.set(controller.calculate(encoder.getAbsolutePosition(), setpoint));
+        } else {
+            motor.stopMotor();
+            System.out.println("ARM ENCODER UNPLUGGED");
+        }
     }
 
     public void periodic() {
@@ -60,7 +62,6 @@ public class Arm {
         SmartDashboard.putNumber("Arm Encoder Position", encoder.getAbsolutePosition());
         SmartDashboard.putBoolean("NearSetpoint", this.nearSetpoint());
         SmartDashboard.putBoolean("WaitingForFloorIntake", this.waitingForFloorIntake());
-
 
         if (state == ArmStates.OFF) {
             // Set position to low

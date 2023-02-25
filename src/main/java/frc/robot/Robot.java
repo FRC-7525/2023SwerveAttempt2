@@ -88,12 +88,6 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
 
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
-        
-        arm.periodic();
-        intake.periodic();
-        swerve.periodic();
-        rgb.periodic();
-        floorIntake.periodic();
     }
 
 
@@ -167,6 +161,12 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean("Has Target", !targets.isEmpty());
         SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
         */
+
+        arm.periodic();
+        intake.periodic();
+        swerve.periodic();
+        rgb.periodic();
+        floorIntake.periodic();
     }
 
     @Override
