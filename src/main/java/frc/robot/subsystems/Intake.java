@@ -127,11 +127,11 @@ public class Intake {
                 robot.rgb.setState(RGBStates.Cube); 
             }
 
-            if (controller.getPOV() == 90) {
+            if (robot.secondaryController.getPOV() == 90) {
                 // Right on D-Pad
                 level = ScoringLevels.LEVEL_TWO_CUBE;
                 state = IntakeStates.OUTTAKE;
-            } else if (controller.getPOV() == 180) {
+            } else if (robot.secondaryController.getPOV() == 180) {
                 // Up on D-Pad
                 level = ScoringLevels.LEVEL_ONE;
                 state = IntakeStates.OUTTAKE;
