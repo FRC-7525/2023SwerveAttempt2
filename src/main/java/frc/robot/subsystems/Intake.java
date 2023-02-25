@@ -21,10 +21,10 @@ enum IntakeStates {
     OUTTAKE
 }
 
-enum ButtonLevelStates {
+enum ScoringLevels {
     OFF,
     LEVEL_ONE,
-    LEVEL_TWO
+    LEVEL_TWO_CUBE
 }
 
 public class Intake {
@@ -36,7 +36,7 @@ public class Intake {
 
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
-    ButtonLevelStates level = ButtonLevelStates.OFF;
+    ScoringLevels level = ScoringLevels.OFF;
 
     private final double intakeSpeed = -0.2;
 
@@ -104,14 +104,10 @@ public class Intake {
                 } else {
                     state = IntakeStates.OFF;
                 }
-            } else if (robot.secondaryController.getLeftStickButton()) {
-                level = ButtonLevelStates.LEVEL_ONE;
-            } else if (robot.secondaryController.getRightStickButton()){
-                level = ButtonLevelStates.LEVEL_TWO;
             }
 
             // changes to hold once beam brake is interrupted
-            if (((!isCone && !hasNoObject.get())) && !robot.isManual()) {
+            if (!hasNoObject.get() && !robot.isManual()) {
                 System.out.println("auto transition");
                 state = IntakeStates.HOLD;
             } else if (robot.isManual()) {
@@ -121,7 +117,6 @@ public class Intake {
         } else if (state == IntakeStates.HOLD) {
             // stops motors without changing claw's open/closed status
             leftWheel.set(-0.05);
-            checkForAdvance(IntakeStates.OUTTAKE);
             robot.arm.setState(ArmSetStates.OFF);
 
             if (isCone) {
@@ -131,24 +126,29 @@ public class Intake {
                 stateString = "Holding Cube";
                 robot.rgb.setState(RGBStates.Cube); 
             }
+
+            if (controller.getPOV() == 90) {
+                // Right on D-Pad
+                level = ScoringLevels.LEVEL_TWO_CUBE;
+                state = IntakeStates.OUTTAKE;
+            } else if (controller.getPOV() == 180) {
+                // Up on D-Pad
+                level = ScoringLevels.LEVEL_ONE;
+                state = IntakeStates.OUTTAKE;
+            }
         } else if (state == IntakeStates.OUTTAKE) {
-            if (level == ButtonLevelStates.LEVEL_ONE) {
+            if (level == ScoringLevels.LEVEL_ONE) {
                 robot.arm.setState(ArmSetStates.LEVEL_ONE);
-            
-            if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
-                // outtakes any game piece being held
-                leftWheel.set(-intakeSpeed);
-                robot.rgb.setState(RGBStates.Neutral);
-                stateString = "Outaking Gamepiece Level One";
-            } 
-            } else if (level == ButtonLevelStates.LEVEL_TWO) {
-            robot.arm.setState(ArmSetStates.LEVEL_TWO);
-            if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
-                // outtakes any game piece being held
-                leftWheel.set(-intakeSpeed);
-                robot.rgb.setState(RGBStates.Neutral);
+                stateString = "Outaking Gamepiece Level One"; 
+            } else if (level == ScoringLevels.LEVEL_TWO_CUBE) {
+                robot.arm.setState(ArmSetStates.LEVEL_TWO);
                 stateString = "Outaking Gamepiece Level Two";
-            } 
+            }
+
+            if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
+                // outtakes any game piece being held
+                leftWheel.set(-intakeSpeed);
+                robot.rgb.setState(RGBStates.Neutral);
             } else {
                 leftWheel.set(0);
             }
@@ -158,11 +158,9 @@ public class Intake {
                 state = IntakeStates.OFF;
             } else if (robot.isManual()) {
                 checkForAdvance(IntakeStates.OFF);
-            } else {
-                leftWheel.set(0);
-            } 
-            
+            }
         }
+
         SmartDashboard.putString("Intake State", stateString);
     }
     
