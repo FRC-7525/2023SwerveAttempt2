@@ -95,7 +95,7 @@ public class Arm {
         } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE) {
             floorTimer.start();
             setpoint = 0.8;
-            stateString = "Moving Floor Intake (pre-Cone Intake)";
+            stateString = "Moving Floor Intake (Pre-Cone Intake)";
             robot.floorIntake.setState(FloorIntakeStates.ON);
 
             if (floorTimer.get() > 1) {
@@ -105,8 +105,8 @@ public class Arm {
             }
         } else if (state == ArmStates.LEVEL_ONE) {
             stateString = "Level One Scoring";
-            setpoint = 0.7;
-            robot.floorIntake.setState(FloorIntakeStates.ON);
+            setpoint = 0.69;
+            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
         } else if (state == ArmStates.LEVEL_TWO) {
             stateString = "Level Two Scoring";
             setpoint = 0.65;

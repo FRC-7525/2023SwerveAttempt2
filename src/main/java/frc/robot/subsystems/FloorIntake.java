@@ -9,7 +9,8 @@ import frc.robot.Robot;
 
 enum FloorIntakeStates {
     OFF,
-    ON
+    ON,
+    DOWN_HOLD
 }
 
 public class FloorIntake {
@@ -34,6 +35,10 @@ public class FloorIntake {
             stateString = "On";
             solenoid.set(true);
             motor.set(0.45);
+        } else if (state == FloorIntakeStates.DOWN_HOLD) {
+            stateString = "Holding Down";
+            solenoid.set(true);
+            motor.set(0);
         }
 
         SmartDashboard.putString("Floor Intake State", stateString);

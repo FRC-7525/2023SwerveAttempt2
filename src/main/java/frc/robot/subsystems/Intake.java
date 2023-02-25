@@ -130,17 +130,18 @@ public class Intake {
                 level = ScoringLevels.LEVEL_TWO_CUBE;
                 state = IntakeStates.OUTTAKE;
             } else if (robot.secondaryController.getPOV() == 180) {
-                // Up on D-Pad
+                // Down on D-Pad
                 level = ScoringLevels.LEVEL_ONE;
                 state = IntakeStates.OUTTAKE;
             }
         } else if (state == IntakeStates.OUTTAKE) {
             if (level == ScoringLevels.LEVEL_ONE) {
                 robot.arm.setState(ArmSetStates.LEVEL_ONE);
-                stateString = "Outaking Gamepiece Level One"; 
+                robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+                stateString = "Outtaking Gamepiece Level One"; 
             } else if (level == ScoringLevels.LEVEL_TWO_CUBE) {
                 robot.arm.setState(ArmSetStates.LEVEL_TWO);
-                stateString = "Outaking Gamepiece Level Two";
+                stateString = "Outtaking Gamepiece Level Two";
             }
 
             if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
