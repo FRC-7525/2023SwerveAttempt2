@@ -33,6 +33,7 @@ enum ArmSetStates {
 public class Arm {
     private String stateString;
     CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
+    CANSparkMax followMotor = new CANSparkMax(2, MotorType.kBrushless);
     Solenoid arm = new Solenoid(PneumaticsModuleType.REVPH, 0);
     PIDController controller = new PIDController(4, 0, 0);
     DutyCycleEncoder encoder = new DutyCycleEncoder(0);
@@ -46,6 +47,7 @@ public class Arm {
     public Arm(Robot robot) {
         this.robot = robot;
         motor.restoreFactoryDefaults();
+        followMotor.follow(motor, true);
     }
 
     private void toSetpoint() {
