@@ -25,8 +25,8 @@ enum ScoringLevels {
 }
 
 public class Intake {
-    CANSparkMax leftWheel = new CANSparkMax(11, MotorType.kBrushless);
-    CANSparkMax rightWheel = new CANSparkMax(10, MotorType.kBrushless);
+    CANSparkMax leftWheel = new CANSparkMax(10, MotorType.kBrushless);
+    CANSparkMax rightWheel = new CANSparkMax(11, MotorType.kBrushless);
     Solenoid claw = new Solenoid(PneumaticsModuleType.REVPH, 1);
 
     DigitalInput hasNoObject = new DigitalInput(1);
@@ -37,27 +37,28 @@ public class Intake {
 
     Timer releasing_cone_timer = new Timer();
 
-    private final double intakeSpeed = -0.2;
+    private final double intakeSpeed = 0.2;
 
     private boolean isCone = false;
 
     public Intake(Robot robot) {
+        leftWheel.restoreFactoryDefaults();
+        rightWheel.restoreFactoryDefaults();
+
         rightWheel.follow(leftWheel, true);
         this.robot = robot;
     }
 
-
-
     public void periodic() {
         SmartDashboard.putBoolean("Is Cone?", isCone);
         claw.set(isCone);
-        SmartDashboard.putBoolean("Solenoid Status", claw.get());
+        SmartDashboard.putBoolean(" Claw Solenoid Status", claw.get());
         String stateString = "";
         
 
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
-            System.out.println("intake off");
+            System.out.println("Intake Off");
             leftWheel.stopMotor();
             robot.rgb.setState(RGBStates.Neutral);
             robot.arm.setState(ArmSetStates.OFF);
@@ -65,7 +66,7 @@ public class Intake {
             stateString = "Off";
             // shift to intakes
             if (robot.secondaryController.getYButtonPressed()) {
-                System.out.println("y button pressed (switching to cube intake)");
+                System.out.println("Y Button Pressed (switching to cube intake)");
                 if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cube);
                 } else {
@@ -73,7 +74,7 @@ public class Intake {
                     state = IntakeStates.INTAKE;
                 }
             } else if (robot.secondaryController.getAButtonPressed()) {
-                System.out.println("a button pressed (switching to cone intake)");
+                System.out.println("A Button Pressed (switching to cone intake)");
                 if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cone);
                 } else {
@@ -83,7 +84,7 @@ public class Intake {
             }
         } else if (state == IntakeStates.INTAKE) {
             leftWheel.set(intakeSpeed);
-            System.out.println("in intake state");
+            System.out.println("In Intake State");
 
             if (isCone) {
                 stateString = "Intaking Cone";
@@ -112,15 +113,16 @@ public class Intake {
 
             // changes to hold once beam brake is interrupted
             if (!hasNoObject.get() && !robot.isManual()) {
-                System.out.println("auto transition");
+                System.out.println("Auto Transition");
                 state = IntakeStates.HOLD;
             } else if (robot.isManual()) {
-                System.out.println("Check manual transition");
+                System.out.println("Check Manual Transition");
                 checkForAdvance(IntakeStates.HOLD);
             }
         } else if (state == IntakeStates.HOLD) {
+            System.out.println("In Hold");
             // stops motors without changing claw's open/closed status
-            leftWheel.set(-0.05);
+            leftWheel.set(0.05);
             robot.arm.setState(ArmSetStates.OFF);
 
             if (isCone) {

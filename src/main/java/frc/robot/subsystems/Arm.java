@@ -78,10 +78,14 @@ public class Arm {
             stateString = "Intaking Cube";
             robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.CONE_ON) {
-            arm.set(true);
-            setpoint = 0.62;
+            setpoint = 0.6;
             stateString = "Intaking Cone";
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+            if (nearSetpoint()) {
+                arm.set(true);
+            } else {
+                arm.set(false);
+            }
         } else if (state == ArmStates.TURNING_OFF) {
             turningOffTimer.start();
             arm.set(false);
@@ -99,8 +103,9 @@ public class Arm {
             setpoint = 0.8;
             stateString = "Moving Floor Intake (Pre-Cone Intake)";
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+            arm.set(false);
 
-            if (floorTimer.get() > 0.5) {
+            if (floorTimer.get() > 0.8) {
                 state = nextState;
                 floorTimer.reset();
                 floorTimer.stop();
@@ -111,11 +116,14 @@ public class Arm {
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
         } else if (state == ArmStates.LEVEL_TWO) {
             stateString = "Level Two Scoring";
-            setpoint = 0.65;
+            setpoint = 0.6;
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+            if (nearSetpoint()) {
+                arm.set(true);
+            } else {
+                arm.set(false);
+            }
         }
-
-        
 
         SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
@@ -170,12 +178,8 @@ public class Arm {
             }
         }  else if (this.state == ArmStates.LEVEL_TWO) {
             if (state == ArmSetStates.OFF) {
-                if (robot.intake.isCone()) {
-                    this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
-                    this.nextState = ArmStates.OFF;
-                } else {
-                    this.state = ArmStates.OFF;
-                }
+                turningOffTimer.reset();
+                this.state = ArmStates.TURNING_OFF;
             }
         }
     }

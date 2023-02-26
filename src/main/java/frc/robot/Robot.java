@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-
+import frc.robot.autos.exampleAuto;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Intake;
@@ -17,6 +17,7 @@ import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
@@ -57,8 +58,6 @@ public class Robot extends TimedRobot {
     public Arm arm = new Arm(this);
     public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
-    CvSink cvSink = CameraServer.getVideo();
-
     public boolean isManual() {
         return true;
     }
@@ -91,10 +90,7 @@ public class Robot extends TimedRobot {
         compressor.enableAnalog(80, 120);
         ph.enableCompressorAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
-
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
-
-        CvSource outputStream = CameraServer.putVideo("Robot Stream", 640, 480);
     }
 
 
@@ -109,13 +105,13 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-
+        CommandScheduler.getInstance().schedule(new exampleAuto(swerve));
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-    
+        CommandScheduler.getInstance().run();
     }
 
     @Override
@@ -144,7 +140,8 @@ public class Robot extends TimedRobot {
 
         double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftY()), Constants.stickDeadband);
         double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getRightX()), Constants.stickDeadband);
-        rotationVal += translationVal * 0.01;
+        //rotationVal += translationVal * 0.01;
+        rotationVal *= 0.75;
 
         double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftX()), Constants.stickDeadband);
 

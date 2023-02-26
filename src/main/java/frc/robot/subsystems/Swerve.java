@@ -25,7 +25,7 @@ public class Swerve extends SubsystemBase {
     public AHRS gyro;
 
     public Swerve() {
-        gyro = new AHRS(SerialPort.Port.kMXP);
+        gyro = new AHRS(SerialPort.Port.kUSB);
         zeroGyro();
 
         mSwerveMods = new SwerveModule[] {
@@ -47,6 +47,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        SmartDashboard.putNumber("Gyro Heading", gyro.getYaw());
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
