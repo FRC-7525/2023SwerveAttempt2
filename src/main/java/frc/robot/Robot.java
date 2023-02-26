@@ -17,9 +17,12 @@ import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+
 
 
 /**
@@ -54,6 +57,8 @@ public class Robot extends TimedRobot {
     public Arm arm = new Arm(this);
     public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
+    CvSink cvSink = CameraServer.getVideo();
+
     public boolean isManual() {
         return true;
     }
@@ -67,7 +72,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {        
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
-
+        CameraServer.startAutomaticCapture();
     }
     
     /**
@@ -88,6 +93,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
 
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
+
+        CvSource outputStream = CameraServer.putVideo("Robot Stream", 640, 480);
     }
 
 
