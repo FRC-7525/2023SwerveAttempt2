@@ -79,12 +79,12 @@ public class Arm {
             arm.set(true);
             setpoint = 0.62;
             stateString = "Intaking Cone";
-            robot.floorIntake.setState(FloorIntakeStates.ON);
+            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
         } else if (state == ArmStates.TURNING_OFF) {
             turningOffTimer.start();
             arm.set(false);
             stateString = "Arm Resetting (for safety)";
-            robot.floorIntake.setState(FloorIntakeStates.ON);
+            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
             if (turningOffTimer.get() > 3) {
                 state = ArmStates.OFF;
                 turningOffTimer.reset();
@@ -96,9 +96,9 @@ public class Arm {
             floorTimer.start();
             setpoint = 0.8;
             stateString = "Moving Floor Intake (Pre-Cone Intake)";
-            robot.floorIntake.setState(FloorIntakeStates.ON);
+            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
 
-            if (floorTimer.get() > 1) {
+            if (floorTimer.get() > 0.5) {
                 state = nextState;
                 floorTimer.reset();
                 floorTimer.stop();
@@ -110,7 +110,7 @@ public class Arm {
         } else if (state == ArmStates.LEVEL_TWO) {
             stateString = "Level Two Scoring";
             setpoint = 0.65;
-            robot.floorIntake.setState(FloorIntakeStates.ON);
+            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
         }
 
         
@@ -158,8 +158,10 @@ public class Arm {
             }
         } else if (this.state == ArmStates.LEVEL_ONE) {
             if (state == ArmSetStates.OFF) {
+                // TODO: may be able to to remove if on Level One/Two
                 if (robot.intake.isCone()) {
-                    this.state = ArmStates.TURNING_OFF;
+                    this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                    this.nextState = ArmStates.OFF;
                 } else {
                     this.state = ArmStates.OFF;
                 }
@@ -167,7 +169,8 @@ public class Arm {
         }  else if (this.state == ArmStates.LEVEL_TWO) {
             if (state == ArmSetStates.OFF) {
                 if (robot.intake.isCone()) {
-                    this.state = ArmStates.TURNING_OFF;
+                    this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                    this.nextState = ArmStates.OFF;
                 } else {
                     this.state = ArmStates.OFF;
                 }

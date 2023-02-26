@@ -134,10 +134,9 @@ public class Intake {
                 level = ScoringLevels.LEVEL_ONE;
                 state = IntakeStates.OUTTAKE;
             }
-        } else if (state == IntakeStates.OUTTAKE) {
+        } else if (state == IntakeStates.OUTTAKE) {            
             if (level == ScoringLevels.LEVEL_ONE) {
                 robot.arm.setState(ArmSetStates.LEVEL_ONE);
-                robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
                 stateString = "Outtaking Gamepiece Level One"; 
             } else if (level == ScoringLevels.LEVEL_TWO_CUBE) {
                 robot.arm.setState(ArmSetStates.LEVEL_TWO);
