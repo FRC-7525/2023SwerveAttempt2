@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
     private final SendableChooser<SequentialCommandGroup> chooser = new SendableChooser<>();
 
     public boolean isManual() {
-        return true;
+        return isManual;
     }
 
     private void reset() {
@@ -156,9 +156,15 @@ public class Robot extends TimedRobot {
         double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftY()), Constants.stickDeadband);
         double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getRightX()), Constants.stickDeadband);
         //rotationVal += translationVal * 0.01;
-        rotationVal *= 0.75;
-
         double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftX()), Constants.stickDeadband);
+        
+        if (primaryController.getLeftBumper()) {
+            rotationVal *= 0.3;
+            translationVal *= 0.5;
+            strafeVal *= 0.5;
+        } else {
+            rotationVal *= 0.75;
+        }
 
         swerve.drive(
                 new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
