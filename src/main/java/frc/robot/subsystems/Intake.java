@@ -8,18 +8,20 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
+import edu.wpi.first.wpilibj.Timer;
 
 enum IntakeStates {
     OFF,
     INTAKE,
     HOLD,
-    OUTTAKE
+    OUTTAKE,
+    RELEASING_CONE
 }
 
 enum ScoringLevels {
     OFF,
     LEVEL_ONE,
-    LEVEL_TWO_CUBE
+    LEVEL_TWO
 }
 
 public class Intake {
@@ -33,6 +35,8 @@ public class Intake {
     IntakeStates state = IntakeStates.OFF;
     ScoringLevels level = ScoringLevels.OFF;
 
+    Timer releasing_cone_timer = new Timer();
+
     private final double intakeSpeed = -0.2;
 
     private boolean isCone = false;
@@ -41,6 +45,8 @@ public class Intake {
         rightWheel.follow(leftWheel, true);
         this.robot = robot;
     }
+
+
 
     public void periodic() {
         SmartDashboard.putBoolean("Is Cone?", isCone);
@@ -127,7 +133,7 @@ public class Intake {
 
             if (robot.secondaryController.getPOV() == 90) {
                 // Right on D-Pad
-                level = ScoringLevels.LEVEL_TWO_CUBE;
+                level = ScoringLevels.LEVEL_TWO;
                 state = IntakeStates.OUTTAKE;
             } else if (robot.secondaryController.getPOV() == 180) {
                 // Down on D-Pad
@@ -138,25 +144,34 @@ public class Intake {
             if (level == ScoringLevels.LEVEL_ONE) {
                 robot.arm.setState(ArmSetStates.LEVEL_ONE);
                 stateString = "Outtaking Gamepiece Level One"; 
-            } else if (level == ScoringLevels.LEVEL_TWO_CUBE) {
+            } else if (level == ScoringLevels.LEVEL_TWO) {
                 robot.arm.setState(ArmSetStates.LEVEL_TWO);
                 stateString = "Outtaking Gamepiece Level Two";
             }
 
-            if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
-                // outtakes any game piece being held
-                leftWheel.set(-intakeSpeed);
-                robot.rgb.setState(RGBStates.Neutral);
-            } else {
+            if (isCone && level == ScoringLevels.LEVEL_TWO) {
                 leftWheel.set(0);
+                checkForAdvance(IntakeStates.RELEASING_CONE);
+            } else {
+                if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
+                    // outtakes any game piece being held
+                    leftWheel.set(-intakeSpeed);
+                    robot.rgb.setState(RGBStates.Neutral);
+                } else {
+                    leftWheel.set(0);
+                }
+
+                // once the piece isn't sensed the claw is turned "off"
+                if (hasNoObject.get() && !robot.isManual()) {
+                    state = IntakeStates.OFF;
+                } else if (robot.isManual()) {
+                    checkForAdvance(IntakeStates.OFF);
+                }
             }
-            
-            // once the piece isn't sensed the claw is turned "off" 
-            if (hasNoObject.get() && !robot.isManual()) {
-                state = IntakeStates.OFF;
-            } else if (robot.isManual()) {
-                checkForAdvance(IntakeStates.OFF);
-            }
+        } else if (state == IntakeStates.RELEASING_CONE) {
+            stateString = "Releasing Cone (B to turn off)";
+            claw.set(false);
+            checkForAdvance(IntakeStates.OFF);
         }
 
         SmartDashboard.putString("Intake State", stateString);
