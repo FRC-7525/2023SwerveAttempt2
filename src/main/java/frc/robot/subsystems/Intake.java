@@ -41,6 +41,8 @@ public class Intake {
     }
 
     private final double INTAKE_SPEED = 0.2;
+    Timer releaseTimer = new Timer();
+
 
     private boolean isCone = false;
     private final double HOLD_SPEED = 0.05;
@@ -174,10 +176,16 @@ public class Intake {
             } else {
                 if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                     // outtakes any game piece being held
-                    leftWheel.set(-INTAKE_SPEED);
-                    robot.rgb.setState(RGBStates.Neutral);
+                    releaseTimer.start();
+                    if (releaseTimer.get() > 2 || level == ScoringLevels.LEVEL_ONE) {
+                        leftWheel.set(-INTAKE_SPEED);
+                        robot.rgb.setState(RGBStates.Neutral);
+                        releaseTimer.reset();
+                        releaseTimer.stop();
+                    }
                 } else {
                     leftWheel.set(HOLD_SPEED);
+                    releaseTimer.reset();
                 }
 
                 // once the piece isn't sensed the claw is turned "off"

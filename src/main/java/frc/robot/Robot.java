@@ -159,9 +159,9 @@ public class Robot extends TimedRobot {
         double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftX()), Constants.stickDeadband);
         
         if (primaryController.getLeftBumper()) {
-            rotationVal *= 0.3;
-            translationVal *= 0.5;
-            strafeVal *= 0.5;
+            rotationVal *= 0.1;
+            translationVal *= 0.2;
+            strafeVal *= 0.2;
         } else {
             rotationVal *= 0.75;
         }
