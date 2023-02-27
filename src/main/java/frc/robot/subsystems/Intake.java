@@ -21,7 +21,8 @@ enum IntakeStates {
 enum ScoringLevels {
     OFF,
     LEVEL_ONE,
-    LEVEL_TWO
+    LEVEL_TWO,
+    LEVEL_THREE
 }
 
 public class Intake {
@@ -35,15 +36,17 @@ public class Intake {
     IntakeStates state = IntakeStates.OFF;
     ScoringLevels level = ScoringLevels.OFF;
 
-    Timer releasing_cone_timer = new Timer();
-
-    private final double intakeSpeed = 0.2;
+    private final double INTAKE_SPEED = 0.2;
 
     private boolean isCone = false;
+    private final double HOLD_SPEED = 0.05;
 
     public Intake(Robot robot) {
         leftWheel.restoreFactoryDefaults();
         rightWheel.restoreFactoryDefaults();
+        
+        leftWheel.setSmartCurrentLimit(15);
+        rightWheel.setSmartCurrentLimit(15);
 
         rightWheel.follow(leftWheel, true);
         this.robot = robot;
@@ -83,7 +86,7 @@ public class Intake {
                 }
             }
         } else if (state == IntakeStates.INTAKE) {
-            leftWheel.set(intakeSpeed);
+            leftWheel.set(INTAKE_SPEED);
             System.out.println("In Intake State");
 
             if (isCone) {
@@ -122,7 +125,7 @@ public class Intake {
         } else if (state == IntakeStates.HOLD) {
             System.out.println("In Hold");
             // stops motors without changing claw's open/closed status
-            leftWheel.set(0.05);
+            leftWheel.set(HOLD_SPEED);
             robot.arm.setState(ArmSetStates.OFF);
 
             if (isCone) {
@@ -133,42 +136,48 @@ public class Intake {
                 robot.rgb.setState(RGBStates.Cube); 
             }
 
-            if (robot.secondaryController.getPOV() == 90) {
-                // Right on D-Pad
+            if (robot.secondaryController.getPOV() == 90 || robot.secondaryController.getPOV() == 270) {
+                // Left/Right on D-Pad
                 level = ScoringLevels.LEVEL_TWO;
                 state = IntakeStates.OUTTAKE;
             } else if (robot.secondaryController.getPOV() == 180) {
                 // Down on D-Pad
                 level = ScoringLevels.LEVEL_ONE;
                 state = IntakeStates.OUTTAKE;
+            } else if (robot.secondaryController.getPOV() == 0) {
+                // Up on D-Pad, only for cubes
+                if (!isCone) {
+                    level = ScoringLevels.LEVEL_THREE;
+                    state = IntakeStates.OUTTAKE;
+                }
             }
-        } else if (state == IntakeStates.OUTTAKE) {            
+        } else if (state == IntakeStates.OUTTAKE) { 
+            // State setup           
             if (level == ScoringLevels.LEVEL_ONE) {
                 robot.arm.setState(ArmSetStates.LEVEL_ONE);
-                stateString = "Outtaking Gamepiece Level One"; 
+                stateString = "Outtaking Gamepiece (Level One)"; 
             } else if (level == ScoringLevels.LEVEL_TWO) {
                 robot.arm.setState(ArmSetStates.LEVEL_TWO);
-                stateString = "Outtaking Gamepiece Level Two";
+                stateString = "Outtaking Gamepiece (Level Two)";
+            } else if (level == ScoringLevels.LEVEL_THREE) {
+                robot.arm.setState(ArmSetStates.LEVEL_THREE);
+                stateString = "Outtaking Gamepiece (Level Three)";
             }
 
             if (isCone && level == ScoringLevels.LEVEL_TWO) {
-                leftWheel.set(0);
+                leftWheel.set(HOLD_SPEED);
                 checkForAdvance(IntakeStates.RELEASING_CONE);
             } else {
                 if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                     // outtakes any game piece being held
-                    leftWheel.set(-intakeSpeed);
+                    leftWheel.set(-INTAKE_SPEED);
                     robot.rgb.setState(RGBStates.Neutral);
                 } else {
-                    leftWheel.set(0);
+                    leftWheel.set(HOLD_SPEED);
                 }
 
                 // once the piece isn't sensed the claw is turned "off"
-                if (hasNoObject.get() && !robot.isManual()) {
-                    state = IntakeStates.OFF;
-                } else if (robot.isManual()) {
-                    checkForAdvance(IntakeStates.OFF);
-                }
+                checkForAdvance(IntakeStates.OFF);
             }
         } else if (state == IntakeStates.RELEASING_CONE) {
             stateString = "Releasing Cone (B to turn off)";
@@ -177,8 +186,7 @@ public class Intake {
         }
 
         SmartDashboard.putString("Intake State", stateString);
-    }
-    
+    }    
 
     private void checkForAdvance(IntakeStates next) {
         if (robot.secondaryController.getBButtonPressed()) {

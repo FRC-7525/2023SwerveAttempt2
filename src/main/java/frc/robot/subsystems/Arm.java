@@ -19,7 +19,8 @@ enum ArmStates {
     TURNING_OFF,
     WAITING_FOR_FLOOR_INTAKE,
     LEVEL_ONE,
-    LEVEL_TWO
+    LEVEL_TWO,
+    LEVEL_THREE
 }
 
 enum ArmSetStates {
@@ -27,7 +28,8 @@ enum ArmSetStates {
     CUBE_ON,
     CONE_ON,
     LEVEL_ONE,
-    LEVEL_TWO
+    LEVEL_TWO,
+    LEVEL_THREE
 }
 
 public class Arm {
@@ -122,6 +124,15 @@ public class Arm {
                 arm.set(true);
             } else {
                 arm.set(false);
+            } 
+        } else if (state == ArmStates.LEVEL_THREE) {
+            stateString = "Level Three Scoring";
+            setpoint = 0.6;
+            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+            if (nearSetpoint()) {
+                arm.set(true);
+            } else {
+                arm.set(false);
             }
         }
 
@@ -154,6 +165,11 @@ public class Arm {
                 this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
                 this.nextState = ArmStates.LEVEL_TWO;
             }
+            if (state == ArmSetStates.LEVEL_THREE) {
+                floorTimer.reset();
+                this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                this.nextState = ArmStates.LEVEL_THREE;
+            }
             if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
         } else if (this.state == ArmStates.CUBE_ON) {
             if (state == ArmSetStates.OFF) this.state = ArmStates.OFF;
@@ -168,7 +184,6 @@ public class Arm {
             }
         } else if (this.state == ArmStates.LEVEL_ONE) {
             if (state == ArmSetStates.OFF) {
-                // TODO: may be able to to remove if on Level One/Two
                 if (robot.intake.isCone()) {
                     this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
                     this.nextState = ArmStates.OFF;
@@ -176,7 +191,7 @@ public class Arm {
                     this.state = ArmStates.OFF;
                 }
             }
-        }  else if (this.state == ArmStates.LEVEL_TWO) {
+        } else if (this.state == ArmStates.LEVEL_TWO || this.state == ArmStates.LEVEL_THREE) {
             if (state == ArmSetStates.OFF) {
                 turningOffTimer.reset();
                 this.state = ArmStates.TURNING_OFF;
