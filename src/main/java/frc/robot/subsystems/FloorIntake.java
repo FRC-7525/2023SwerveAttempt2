@@ -36,11 +36,11 @@ public class FloorIntake {
             solenoid.set(false);
             motor.set(0);
         } else if (state == FloorIntakeStates.ON) {
-            stateString = "On";
+            stateString = "On (Wheels On)";
             solenoid.set(true);
             motor.set(0.45);
         } else if (state == FloorIntakeStates.DOWN_HOLD) {
-            stateString = "Holding Down";
+            stateString = "On (Wheels Off)";
             solenoid.set(true);
             motor.set(0);
         }
