@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.autos.BalanceAuto;
+import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.DriveBackwardsAuto;
+import frc.robot.autos.ScoreLevelOneAuto;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Intake;
@@ -73,6 +76,13 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
         chooser.setDefaultOption("Drive Backwards", new DriveBackwardsAuto(swerve));
+        chooser.addOption("Backwards and Auto Balance", new BalanceAuto(swerve));
+        chooser.addOption("Do Nothing", new DoNothingAuto());
+        chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
+        chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
+
+        SmartDashboard.putData("Auto Chooser", chooser);
+
         reset();
     }
     
@@ -107,8 +117,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        CommandScheduler.getInstance().schedule(chooser.getSelected());
         reset();
+        CommandScheduler.getInstance().schedule(chooser.getSelected());
     }
 
     /** This function is called periodically during autonomous. */

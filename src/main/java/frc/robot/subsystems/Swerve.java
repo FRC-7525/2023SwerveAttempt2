@@ -46,6 +46,10 @@ public class Swerve extends SubsystemBase {
         return input * SmartDashboard.getNumber("Speed", 1);
     }
 
+    public double getElevationAngle() {
+        return Rotation2d.fromDegrees(gyro.getPitch()).getDegrees();
+    }
+
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         SmartDashboard.putNumber("Gyro Heading", gyro.getYaw());
         SwerveModuleState[] swerveModuleStates =

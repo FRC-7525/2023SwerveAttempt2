@@ -201,4 +201,11 @@ public class Intake {
     public boolean isCone() {
         return this.isCone;
     }
+
+    // Autonomous Setups    
+    public void setUpLevelOne(boolean isCone) {
+        this.isCone = isCone;
+        level = ScoringLevels.LEVEL_ONE;
+        state = IntakeStates.OUTTAKE;
+    }
 }
