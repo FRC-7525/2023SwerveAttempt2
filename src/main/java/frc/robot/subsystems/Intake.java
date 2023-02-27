@@ -74,7 +74,7 @@ public class Intake {
 
             stateString = "Off";
             // shift to intakes
-            if (robot.secondaryController.getYButtonPressed()) {
+            if (robot.primaryController.getAButtonPressed()) {
                 System.out.println("Y Button Pressed (switching to cube intake)");
                 if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cube);
@@ -82,7 +82,7 @@ public class Intake {
                     isCone = false;
                     state = IntakeStates.INTAKE;
                 }
-            } else if (robot.secondaryController.getAButtonPressed()) {
+            } else if (robot.primaryController.getYButtonPressed()) {
                 System.out.println("A Button Pressed (switching to cone intake)");
                 if (robot.secondaryController.getLeftBumperPressed()) {
                     robot.rgb.setState(RGBStates.Cone);
@@ -106,13 +106,13 @@ public class Intake {
             }
 
             // opens or closes claw based on cube/cone and spins rollers
-            if (robot.secondaryController.getYButtonPressed()) {
+            if (robot.primaryController.getAButtonPressed()) {
                 if (isCone) {
                     isCone = false;
                 } else {
                     state = IntakeStates.OFF;
                 }
-            } else if (robot.secondaryController.getAButtonPressed()) {
+            } else if (robot.primaryController.getYButtonPressed()) {
                 if (!isCone) {
                     isCone = true;
                 } else {
