@@ -186,6 +186,7 @@ public class Arm {
         } else if (this.state == ArmStates.LEVEL_ONE) {
             if (state == ArmSetStates.OFF) {
                 if (robot.intake.isCone()) {
+                    floorTimer.reset();
                     this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
                     this.nextState = ArmStates.OFF;
                 } else {
