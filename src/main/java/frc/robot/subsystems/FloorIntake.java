@@ -22,6 +22,10 @@ public class FloorIntake {
     FloorIntakeStates state = FloorIntakeStates.OFF;
     Robot robot = null;
 
+    public void reset() {
+        state = FloorIntakeStates.OFF;
+    }
+
     public FloorIntake(Robot robot) {
         this.robot = robot;
     }
