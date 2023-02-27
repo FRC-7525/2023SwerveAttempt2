@@ -26,6 +26,10 @@ public class RGB {
     public void setState(RGBStates state) {
         this.state = state;
     }
+    
+    public void reset() {
+        state = RGBStates.Neutral;
+    }
 
     public void periodic() {
         if (state == RGBStates.Cone) {

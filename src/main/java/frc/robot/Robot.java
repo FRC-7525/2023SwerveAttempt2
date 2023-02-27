@@ -54,6 +54,13 @@ public class Robot extends TimedRobot {
     public boolean isManual() {
         return true;
     }
+
+    private void reset() {
+        arm.reset();
+        intake.reset();
+        floorIntake.reset();
+        rgb.reset();
+    }
     
     /**
      * This function is run when the robot is first started up and should be used
@@ -66,6 +73,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
         chooser.setDefaultOption("Drive Backwards", new DriveBackwardsAuto(swerve));
+        reset();
     }
     
     /**
@@ -100,6 +108,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         CommandScheduler.getInstance().schedule(chooser.getSelected());
+        reset();
     }
 
     /** This function is called periodically during autonomous. */
@@ -110,6 +119,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        // TODO: comment out once we have autos!
+        reset();
     }
 
     /** This function is called periodically during operator control. 

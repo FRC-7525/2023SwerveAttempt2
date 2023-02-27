@@ -61,6 +61,10 @@ public class Arm {
         }
     }
 
+    public void reset() {
+        state = ArmStates.OFF;
+    }
+
     public void periodic() {
         // Put encoder value on SmartDashboard
         SmartDashboard.putNumber("Arm Encoder Position", encoder.getAbsolutePosition());

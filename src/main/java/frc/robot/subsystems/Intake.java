@@ -35,6 +35,10 @@ public class Intake {
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
     ScoringLevels level = ScoringLevels.OFF;
+    
+    public void reset() {
+        state = IntakeStates.OFF;
+    }
 
     private final double INTAKE_SPEED = 0.2;
 
