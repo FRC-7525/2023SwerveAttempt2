@@ -178,9 +178,6 @@ public class Arm {
         } else if (this.state == ArmStates.CUBE_ON) {
             if (state == ArmSetStates.OFF) this.state = ArmStates.OFF;
             if (state == ArmSetStates.CONE_ON) this.state = ArmStates.CONE_ON;
-        } else if (this.state == ArmStates.TURNING_OFF) {
-            if (state == ArmSetStates.CONE_ON) this.state = ArmStates.CONE_ON;
-            if (state == ArmSetStates.CUBE_ON) this.state = ArmStates.CUBE_ON;
         } else if (this.state == ArmStates.CONE_ON) {
             if (state == ArmSetStates.OFF || state == ArmSetStates.CUBE_ON) {
                 turningOffTimer.reset();
