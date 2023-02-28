@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     public static CTREConfigs ctreConfigs = new CTREConfigs();
     private Swerve swerve = new Swerve();
 
-    private boolean toggleFieldRelative = false;
+    private boolean toggleFieldRelative = true;
 
     public XboxController primaryController = new XboxController(0);
     public XboxController secondaryController = new XboxController(1);
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
     private final SendableChooser<SequentialCommandGroup> chooser = new SendableChooser<>();
 
     public boolean isManual() {
-        return isManual;
+        return true;
     }
 
     private void reset() {
@@ -99,8 +99,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        compressor.enableAnalog(80, 120);
-        ph.enableCompressorAnalog(80, 120);
+        //compressor.enableAnalog(80, 120);
+        //ph.enableCompressorAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
     }
@@ -137,9 +137,11 @@ public class Robot extends TimedRobot {
      * @return */
     @Override
     public void teleopPeriodic() {
+        /*
         if (secondaryController.getRightBumperPressed()) {
             isManual = !isManual;
         }
+        */
 
         SmartDashboard.putBoolean("Manual Mode", this.isManual());
 

@@ -63,33 +63,23 @@ public class Intake {
         claw.set(isCone);
         SmartDashboard.putBoolean(" Claw Solenoid Status", claw.get());
         String stateString = "";
-        
 
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
             System.out.println("Intake Off");
             leftWheel.stopMotor();
-            robot.rgb.setState(RGBStates.Neutral);
             robot.arm.setState(ArmSetStates.OFF);
 
             stateString = "Off";
             // shift to intakes
-            if (robot.primaryController.getAButtonPressed()) {
-                System.out.println("Y Button Pressed (switching to cube intake)");
-                if (robot.secondaryController.getLeftBumperPressed()) {
-                    robot.rgb.setState(RGBStates.Cube);
-                } else {
-                    isCone = false;
-                    state = IntakeStates.INTAKE;
-                }
+            if (robot.primaryController.getBButtonPressed()) {
+                System.out.println("B Button Pressed (switching to cube intake)");
+                isCone = false;
+                state = IntakeStates.INTAKE;
             } else if (robot.primaryController.getYButtonPressed()) {
-                System.out.println("A Button Pressed (switching to cone intake)");
-                if (robot.secondaryController.getLeftBumperPressed()) {
-                    robot.rgb.setState(RGBStates.Cone);
-                } else {
-                    isCone = true;
-                    state = IntakeStates.INTAKE;
-                }
+                System.out.println("Y Button Pressed (switching to cone intake)");
+                isCone = true;
+                state = IntakeStates.INTAKE;
             }
         } else if (state == IntakeStates.INTAKE) {
             leftWheel.set(INTAKE_SPEED);
@@ -106,7 +96,7 @@ public class Intake {
             }
 
             // opens or closes claw based on cube/cone and spins rollers
-            if (robot.primaryController.getAButtonPressed()) {
+            if (robot.primaryController.getBButtonPressed()) {
                 if (isCone) {
                     isCone = false;
                 } else {

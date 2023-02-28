@@ -43,6 +43,12 @@ public class RGB {
             RGBcontrol.set(0.99);
         }
 
+        if (robot.secondaryController.getLeftBumperPressed()) {
+            state = RGBStates.Cone;
+        } else if (robot.secondaryController.getRightBumperPressed()) {
+            state = RGBStates.Cube;
+        }
+
         SmartDashboard.putString("RGB State", stateString);
     }
 }
