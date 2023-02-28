@@ -13,6 +13,7 @@ import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.DriveBackwardsAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
+import frc.robot.autos.StraightMove;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.Intake;
@@ -75,8 +76,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
-        chooser.setDefaultOption("Drive Backwards", new DriveBackwardsAuto(swerve));
-        chooser.addOption("Backwards and Auto Balance", new BalanceAuto(swerve));
+        chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
+        //chooser.addOption("Backwards and Auto Balance", new BalanceAuto(swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
         chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
         chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
@@ -99,8 +100,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        //compressor.enableAnalog(80, 120);
-        //ph.enableCompressorAnalog(80, 120);
+        compressor.enableAnalog(80, 120);
+        ph.enableCompressorAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
     }
@@ -124,6 +125,11 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
+        arm.periodic();
+        intake.periodic();
+        swerve.periodic();
+        rgb.periodic();
+        floorIntake.periodic();
         CommandScheduler.getInstance().run();
     }
 

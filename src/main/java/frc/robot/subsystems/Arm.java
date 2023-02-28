@@ -124,14 +124,18 @@ public class Arm {
             stateString = "Level Two Scoring";
             setpoint = 0.6;
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
-            if (nearSetpoint()) {
-                arm.set(true);
+            if (robot.intake.isCone()) {
+                if (nearSetpoint()) {
+                    arm.set(true);
+                } else {
+                    arm.set(false);
+                } 
             } else {
                 arm.set(false);
-            } 
+            }
         } else if (state == ArmStates.LEVEL_THREE) {
             stateString = "Level Three Scoring";
-            setpoint = 0.6;
+            setpoint = 0.58;
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
             if (nearSetpoint()) {
                 arm.set(true);
