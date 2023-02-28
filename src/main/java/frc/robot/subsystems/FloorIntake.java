@@ -17,7 +17,7 @@ public class FloorIntake {
     private String stateString;
 
     private WPI_TalonFX motor = new WPI_TalonFX(14);
-    private Solenoid solenoid = new Solenoid(PneumaticsModuleType.REVPH, 2);
+    private Solenoid solenoid = new Solenoid(PneumaticsModuleType.REVPH, 3);
 
     FloorIntakeStates state = FloorIntakeStates.OFF;
     Robot robot = null;
