@@ -1,6 +1,7 @@
 package frc.robot.autos;
 
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.commands.AutoBalance;
 import frc.robot.subsystems.Swerve;
 
@@ -19,40 +20,10 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class BalanceAuto extends SequentialCommandGroup {
-    public BalanceAuto(Swerve swerve){
-        TrajectoryConfig config =
-            new TrajectoryConfig(
-                    Constants.AutoConstants.kMaxSpeedMetersPerSecond,
-                    Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-                .setKinematics(Constants.Swerve.swerveKinematics);
-
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, new Rotation2d(0)),
-            List.of(),
-            new Pose2d(-1, 0, new Rotation2d(0)),
-            config);
-
-        var thetaController =
-            new ProfiledPIDController(
-                Constants.AutoConstants.kPThetaController, 0, 0, Constants.AutoConstants.kThetaControllerConstraints);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-        SwerveControllerCommand swerveControllerCommand =
-            new SwerveControllerCommand(
-                exampleTrajectory,
-                swerve::getPose,
-                Constants.Swerve.swerveKinematics,
-                new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-                new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-                thetaController,
-                swerve::setModuleStates,
-                swerve);
-
-        AutoBalance balanceCommand = new AutoBalance(swerve);
+    public BalanceAuto(Robot robot, Swerve swerve){
+        AutoBalance balanceCommand = new AutoBalance(robot, swerve);
 
         addCommands(
-            new InstantCommand(() -> swerve.resetOdometry(exampleTrajectory.getInitialPose())),
-            swerveControllerCommand,
             balanceCommand
         );
     }

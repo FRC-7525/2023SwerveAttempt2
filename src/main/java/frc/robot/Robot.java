@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
-import frc.robot.autos.DriveBackwardsAuto;
+import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
 import frc.robot.autos.StraightMove;
 import frc.robot.subsystems.Arm;
@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
         floorIntake.reset();
         rgb.reset();
     }
-    
+
     /**
      * This function is run when the robot is first started up and should be used
      * for any
@@ -77,10 +77,11 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
         chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
-        //chooser.addOption("Backwards and Auto Balance", new BalanceAuto(swerve));
+        chooser.addOption("Backwards and Auto Balance", new BalanceAuto(this, swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
         chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
         chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
+        chooser.addOption("Score Level One Cone and Drive Back", new ScoreLevelOneAndBackAuto(this, swerve, true));
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
@@ -158,7 +159,7 @@ public class Robot extends TimedRobot {
         }
 
         if (primaryController.getAButtonPressed()) {
-            swerve.zeroGyro();
+            swerve.zeroYaw();
         }
 
         double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftY()), Constants.stickDeadband);

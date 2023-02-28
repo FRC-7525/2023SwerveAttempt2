@@ -26,7 +26,7 @@ public class Swerve extends SubsystemBase {
 
     public Swerve() {
         gyro = new AHRS(SerialPort.Port.kUSB);
-        zeroGyro();
+        zeroYaw();
         gyro.setAngleAdjustment(0);
 
         mSwerveMods = new SwerveModule[] {
@@ -48,7 +48,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public double getElevationAngle() {
-        return Rotation2d.fromDegrees(gyro.getPitch()).getDegrees();
+        return gyro.getRoll();
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -106,7 +106,7 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-    public void zeroGyro(){
+    public void zeroYaw() {
         gyro.zeroYaw();
     }
 
