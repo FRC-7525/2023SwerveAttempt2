@@ -167,7 +167,7 @@ public class Intake {
                 if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                     // outtakes any game piece being held
                     releaseTimer.start();
-                    if (releaseTimer.get() > 2 || level == ScoringLevels.LEVEL_ONE) {
+                    if (releaseTimer.get() > 2 || level == ScoringLevels.LEVEL_ONE || (!isCone && level == ScoringLevels.LEVEL_TWO)) {
                         leftWheel.set(-INTAKE_SPEED);
                         robot.rgb.setState(RGBStates.Neutral);
                         releaseTimer.reset();

@@ -197,7 +197,18 @@ public class Arm {
                     this.state = ArmStates.OFF;
                 }
             }
-        } else if (this.state == ArmStates.LEVEL_TWO || this.state == ArmStates.LEVEL_THREE) {
+        } else if (this.state == ArmStates.LEVEL_TWO) {
+            if (state == ArmSetStates.OFF) {
+                if (robot.intake.isCone()) {
+                    turningOffTimer.reset();
+                    this.state = ArmStates.TURNING_OFF;
+                } else {
+                    floorTimer.reset();
+                    this.state = ArmStates.WAITING_FOR_FLOOR_INTAKE;
+                    this.nextState = ArmStates.OFF;
+                }
+            }
+        } else if (this.state == ArmStates.LEVEL_THREE) {
             if (state == ArmSetStates.OFF) {
                 turningOffTimer.reset();
                 this.state = ArmStates.TURNING_OFF;
