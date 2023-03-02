@@ -23,7 +23,7 @@ public class BalanceAuto extends SequentialCommandGroup {
     public BalanceAuto(Robot robot, Swerve swerve){
         addCommands(
             new ScoreLevelThreeAuto(robot),
-            new StraightMove(swerve, -2.6, true),
+            new StraightMove(swerve, -2.8, true),
             new AutoBalance(robot, swerve)
         );
     }

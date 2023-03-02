@@ -37,7 +37,7 @@ public class ScoreLevelThree extends CommandBase {
             }
         } else if (state == ScoreLevelThreeState.RETRACT) {
             stateTimer.start();
-            if (stateTimer.get() > 3) {
+            if (stateTimer.get() > 2) {
                 state = ScoreLevelThreeState.DONE;
             }
         }

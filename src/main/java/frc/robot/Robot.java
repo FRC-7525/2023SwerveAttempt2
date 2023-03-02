@@ -137,6 +137,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         intake.resetControllerChecks();
+        swerve.setAngleAdjustment(180);
         // TODO: comment out once we have autos!
         //reset();
     }
