@@ -216,4 +216,10 @@ public class Intake {
         level = ScoringLevels.LEVEL_ONE;
         state = IntakeStates.OUTTAKE;
     }
+
+    public void setUpLevelThree() {
+        isCone = false;
+        level = ScoringLevels.LEVEL_THREE;
+        state = IntakeStates.OUTTAKE;
+    }
 }

@@ -13,6 +13,7 @@ import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
+import frc.robot.autos.ScoreLevelThreeAuto;
 import frc.robot.autos.StraightMove;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FloorIntake;
@@ -81,6 +82,7 @@ public class Robot extends TimedRobot {
         chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
         chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
         chooser.addOption("Score Level One Cone and Drive Back", new ScoreLevelOneAndBackAuto(this, swerve, true));
+        chooser.addOption("Score Level Three Cube", new ScoreLevelThreeAuto(this));
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
