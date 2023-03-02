@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
         chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
-        chooser.addOption("Backwards and Auto Balance", new BalanceAuto(this, swerve));
+        chooser.addOption("Lv3 Cube, Backwards, Auto Balance", new BalanceAuto(this, swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
         chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
         chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
@@ -138,7 +138,7 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         intake.resetControllerChecks();
         // TODO: comment out once we have autos!
-        reset();
+        //reset();
     }
 
     /** This function is called periodically during operator control. 

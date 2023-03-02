@@ -18,6 +18,7 @@ public class FloorIntake {
 
     private WPI_TalonFX motor = new WPI_TalonFX(14);
     private Solenoid solenoid = new Solenoid(PneumaticsModuleType.REVPH, 2);
+    public final double FLOOR_INTAKE_SPEED = 0.5;
 
     FloorIntakeStates state = FloorIntakeStates.OFF;
     Robot robot = null;
@@ -38,12 +39,17 @@ public class FloorIntake {
         } else if (state == FloorIntakeStates.ON) {
             stateString = "On (Wheels On)";
             solenoid.set(true);
-            motor.set(0.5);
+            
+            if (robot.primaryController.getRightBumper()) {
+                motor.set(-FLOOR_INTAKE_SPEED);
+            } else {
+                motor.set(FLOOR_INTAKE_SPEED);
+            }
         } else if (state == FloorIntakeStates.DOWN_HOLD) {
             stateString = "On (Wheels Off)";
             solenoid.set(true);
             motor.set(0);
-        }
+        } 
 
         SmartDashboard.putString("Floor Intake State", stateString);
     }

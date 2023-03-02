@@ -21,10 +21,10 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class BalanceAuto extends SequentialCommandGroup {
     public BalanceAuto(Robot robot, Swerve swerve){
-        AutoBalance balanceCommand = new AutoBalance(robot, swerve);
-
         addCommands(
-            balanceCommand
+            new ScoreLevelThreeAuto(robot),
+            new StraightMove(swerve, -2.6, true),
+            new AutoBalance(robot, swerve)
         );
     }
 }
