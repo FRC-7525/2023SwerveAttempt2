@@ -53,7 +53,7 @@ public class Arm {
     }
 
     private void toSetpoint() {
-        if (encoder.getAbsolutePosition() != 0) {
+        if (encoder.getAbsolutePosition() > 0.55) {
             motor.set(controller.calculate(encoder.getAbsolutePosition(), setpoint));
         } else {
             motor.stopMotor();

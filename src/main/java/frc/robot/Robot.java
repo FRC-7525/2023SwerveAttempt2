@@ -49,7 +49,6 @@ public class Robot extends TimedRobot {
     public FloorIntake floorIntake = new FloorIntake(this);
     public RGB rgb = new RGB(this);
     public Intake intake = new Intake(this);
-    public PneumaticHub ph = new PneumaticHub();
     public Arm arm = new Arm(this);
     public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
@@ -102,7 +101,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         compressor.enableAnalog(80, 120);
-        ph.enableCompressorAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
     }
@@ -136,6 +134,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        intake.resetControllerChecks();
         // TODO: comment out once we have autos!
         reset();
     }
@@ -205,10 +204,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
+        reset();
     }
 
     /** This function is called periodically during test mode. */
     @Override
     public void testPeriodic() {
+        compressor.enableAnalog(119, 120);
     }
 }
