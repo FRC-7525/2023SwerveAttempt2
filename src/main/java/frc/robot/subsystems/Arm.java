@@ -86,7 +86,7 @@ public class Arm {
             stateString = "Intaking Cube";
             robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.CONE_ON) {
-            setpoint = DOWN - 0.2;
+            setpoint = DOWN - 0.195;
             stateString = "Intaking Cone";
             if (nearSetpoint()) {
                 robot.floorIntake.setState(FloorIntakeStates.OFF);
@@ -95,7 +95,7 @@ public class Arm {
             }
         } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE_UP) {
             floorTimer.start();
-            setpoint = DOWN - 0.2;
+            setpoint = DOWN - 0.195;
             stateString = "Moving Floor Intake Out (Pre-Arm Down)";
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
             arm.set(false);
