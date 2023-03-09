@@ -188,12 +188,22 @@ public class Intake {
         }
 
         SmartDashboard.putString("Intake State", stateString);
+        resetControllerChecks();
     }    
 
     private void checkForAdvance(IntakeStates next) {
         if (robot.secondaryController.getBButtonPressed()) {
             state = next;
         }
+    }
+
+    // This calls the "pressed" functions, to make sure the
+    // pressed state isn't retained when the button is pressed
+    // earlier on randomly
+    public void resetControllerChecks() {
+        robot.secondaryController.getBButtonPressed();
+        robot.primaryController.getYButtonPressed();
+        robot.primaryController.getBButtonPressed();
     }
 
     public boolean isCone() {
@@ -204,6 +214,12 @@ public class Intake {
     public void setUpLevelOne(boolean isCone) {
         this.isCone = isCone;
         level = ScoringLevels.LEVEL_ONE;
+        state = IntakeStates.OUTTAKE;
+    }
+
+    public void setUpLevelThree() {
+        isCone = false;
+        level = ScoringLevels.LEVEL_THREE;
         state = IntakeStates.OUTTAKE;
     }
 }

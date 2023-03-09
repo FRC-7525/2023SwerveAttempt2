@@ -13,6 +13,7 @@ import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
+import frc.robot.autos.ScoreLevelThreeAuto;
 import frc.robot.autos.StraightMove;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FloorIntake;
@@ -49,7 +50,6 @@ public class Robot extends TimedRobot {
     public FloorIntake floorIntake = new FloorIntake(this);
     public RGB rgb = new RGB(this);
     public Intake intake = new Intake(this);
-    public PneumaticHub ph = new PneumaticHub();
     public Arm arm = new Arm(this);
     public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
@@ -77,11 +77,12 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
         chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
-        chooser.addOption("Backwards and Auto Balance", new BalanceAuto(this, swerve));
+        chooser.addOption("Lv3 Cube, Backwards, Auto Balance", new BalanceAuto(this, swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
         chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
         chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
         chooser.addOption("Score Level One Cone and Drive Back", new ScoreLevelOneAndBackAuto(this, swerve, true));
+        chooser.addOption("Score Level Three Cube", new ScoreLevelThreeAuto(this));
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
@@ -102,7 +103,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         compressor.enableAnalog(80, 120);
-        ph.enableCompressorAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
     }
@@ -136,8 +136,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        intake.resetControllerChecks();
+        swerve.setAngleAdjustment(180);
         // TODO: comment out once we have autos!
-        reset();
+        //reset();
     }
 
     /** This function is called periodically during operator control. 
@@ -205,10 +207,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
+        reset();
     }
 
     /** This function is called periodically during test mode. */
     @Override
     public void testPeriodic() {
+        compressor.enableAnalog(119, 120);
     }
 }
