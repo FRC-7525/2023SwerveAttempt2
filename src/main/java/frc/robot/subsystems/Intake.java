@@ -28,7 +28,7 @@ enum ScoringLevels {
 public class Intake {
     CANSparkMax leftWheel = new CANSparkMax(10, MotorType.kBrushless);
     CANSparkMax rightWheel = new CANSparkMax(11, MotorType.kBrushless);
-    Solenoid claw = new Solenoid(PneumaticsModuleType.REVPH, 1);
+    Solenoid claw = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     DigitalInput hasNoObject = new DigitalInput(1);
 
