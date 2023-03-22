@@ -10,6 +10,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import edu.wpi.first.wpilibj.Timer;
 
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+
 enum IntakeStates {
     OFF,
     INTAKE,
@@ -35,6 +41,8 @@ public class Intake {
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
     ScoringLevels level = ScoringLevels.OFF;
+
+    StringLogEntry intakeStateLog;
     
     public void reset() {
         state = IntakeStates.OFF;
@@ -56,6 +64,9 @@ public class Intake {
 
         rightWheel.follow(leftWheel, true);
         this.robot = robot;
+
+        DataLog log = DataLogManager.getLog();
+        intakeStateLog = new StringLogEntry(log, "/arm/state");
     }
 
     public void periodic() {
@@ -188,6 +199,7 @@ public class Intake {
         }
 
         SmartDashboard.putString("Intake State", stateString);
+        intakeStateLog.append(stateString);
         resetControllerChecks();
     }    
 

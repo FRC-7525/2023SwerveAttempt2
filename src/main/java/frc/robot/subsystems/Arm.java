@@ -12,6 +12,12 @@ import frc.robot.Robot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+
 enum ArmStates {
     OFF,
     CUBE_ON,
@@ -48,10 +54,15 @@ public class Arm {
     final double DOWN = 0.7;
     double setpoint = DOWN;
 
+    StringLogEntry armStateLog;
+
     public Arm(Robot robot) {
         this.robot = robot;
         motor.restoreFactoryDefaults();
         followMotor.follow(motor, true);
+
+        DataLog log = DataLogManager.getLog();
+        armStateLog = new StringLogEntry(log, "/arm/state");
     }
 
     private void toSetpoint() {
@@ -160,6 +171,7 @@ public class Arm {
 
         SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
+        armStateLog.append(stateString);
     }
 
     public boolean nearSetpoint() {
@@ -229,4 +241,5 @@ public class Arm {
             }
         }
     }
+
 }

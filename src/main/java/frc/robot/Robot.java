@@ -29,6 +29,7 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 
 public class Robot extends TimedRobot {
@@ -85,6 +86,8 @@ public class Robot extends TimedRobot {
         chooser.addOption("Score Level Three Cube", new ScoreLevelThreeAuto(this));
 
         SmartDashboard.putData("Auto Chooser", chooser);
+
+        DataLogManager.start();
 
         reset();
     }
