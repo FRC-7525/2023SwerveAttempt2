@@ -30,8 +30,6 @@ public class FloorIntake {
     private Solenoid solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
     public final double FLOOR_INTAKE_SPEED = 0.5;
 
-    
-
     StringLogEntry floorIntakeStateLog;
 
     FloorIntakeStates state = FloorIntakeStates.OFF;
