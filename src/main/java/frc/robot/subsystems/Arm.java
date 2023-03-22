@@ -75,9 +75,12 @@ public class Arm {
         state = ArmStates.OFF;
     }
 
+    public void putEncoderPosition() {
+        SmartDashboard.putNumber("Arm Encoder Position", encoder.getAbsolutePosition());
+    }
+
     public void periodic() {
         // Put encoder value on SmartDashboard
-        SmartDashboard.putNumber("Arm Encoder Position", encoder.getAbsolutePosition());
         SmartDashboard.putBoolean("NearSetpoint", this.nearSetpoint());
         SmartDashboard.putBoolean("WaitingForFloorIntake", this.waitingForFloorIntake());
 

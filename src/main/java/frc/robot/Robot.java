@@ -94,6 +94,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
+        arm.putEncoderPosition();
     }
 
 
