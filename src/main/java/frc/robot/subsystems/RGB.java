@@ -5,6 +5,13 @@ import frc.robot.Robot;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+
+
 enum RGBStates {
     Cone,
     Cube,
@@ -15,9 +22,13 @@ public class RGB {
     private String stateString;
     Spark RGBcontrol = new Spark(0);
     Robot robot = null;
+    StringLogEntry rgbStateLog;
 
     public RGB(Robot robot) {
         this.robot = robot;
+
+        DataLog log = DataLogManager.getLog();
+        rgbStateLog = new StringLogEntry(log, "/rgb/state");
     }
 
     RGBStates state = RGBStates.Neutral;
@@ -50,6 +61,7 @@ public class RGB {
         }
 
         SmartDashboard.putString("RGB State", stateString);
+        rgbStateLog.append(stateString);
     }
 }
 

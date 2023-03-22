@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -11,6 +10,10 @@ import frc.robot.Robot;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 enum ArmStates {
     OFF,
@@ -37,7 +40,7 @@ public class Arm {
     private String stateString;
     CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
     CANSparkMax followMotor = new CANSparkMax(2, MotorType.kBrushless);
-    Solenoid arm = new Solenoid(PneumaticsModuleType.REVPH, 0);
+    Solenoid arm = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
     PIDController controller = new PIDController(4, 0, 0);
     DutyCycleEncoder encoder = new DutyCycleEncoder(0);
     ArmStates state = ArmStates.OFF;
@@ -48,10 +51,15 @@ public class Arm {
     final double DOWN = 0.7;
     double setpoint = DOWN;
 
+    StringLogEntry armStateLog;
+
     public Arm(Robot robot) {
         this.robot = robot;
         motor.restoreFactoryDefaults();
         followMotor.follow(motor, true);
+
+        DataLog log = DataLogManager.getLog();
+        armStateLog = new StringLogEntry(log, "/arm/state");
     }
 
     private void toSetpoint() {
@@ -160,6 +168,7 @@ public class Arm {
 
         SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
+        armStateLog.append(stateString);
     }
 
     public boolean nearSetpoint() {
@@ -229,4 +238,5 @@ public class Arm {
             }
         }
     }
+
 }
