@@ -22,13 +22,13 @@ public class RGB {
     private String stateString;
     Spark RGBcontrol = new Spark(0);
     Robot robot = null;
-    StringLogEntry RGBStateLog;
+    StringLogEntry rgbStateLog;
 
     public RGB(Robot robot) {
         this.robot = robot;
 
         DataLog log = DataLogManager.getLog();
-        RGBStateLog = new StringLogEntry(log, "/RGB/state");
+        rgbStateLog = new StringLogEntry(log, "/rgb/state");
     }
 
     RGBStates state = RGBStates.Neutral;
@@ -61,7 +61,7 @@ public class RGB {
         }
 
         SmartDashboard.putString("RGB State", stateString);
-        RGBStateLog.append(stateString);
+        rgbStateLog.append(stateString);
     }
 }
 
