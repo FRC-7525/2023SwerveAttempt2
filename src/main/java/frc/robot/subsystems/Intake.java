@@ -10,9 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import edu.wpi.first.wpilibj.Timer;
 
-import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 
@@ -32,8 +30,7 @@ enum ScoringLevels {
 }
 
 public class Intake {
-    CANSparkMax leftWheel = new CANSparkMax(10, MotorType.kBrushless);
-    CANSparkMax rightWheel = new CANSparkMax(11, MotorType.kBrushless);
+    CANSparkMax wheel = new CANSparkMax(10, MotorType.kBrushless);
     Solenoid claw = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     DigitalInput hasNoObject = new DigitalInput(1);
@@ -56,13 +53,9 @@ public class Intake {
     private final double HOLD_SPEED = 0.05;
 
     public Intake(Robot robot) {
-        leftWheel.restoreFactoryDefaults();
-        rightWheel.restoreFactoryDefaults();
+        wheel.restoreFactoryDefaults();
         
-        leftWheel.setSmartCurrentLimit(15);
-        rightWheel.setSmartCurrentLimit(15);
-
-        rightWheel.follow(leftWheel, true);
+        wheel.setSmartCurrentLimit(15);
         this.robot = robot;
 
         DataLog log = DataLogManager.getLog();
@@ -78,7 +71,7 @@ public class Intake {
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
             System.out.println("Intake Off");
-            leftWheel.stopMotor();
+            wheel.stopMotor();
             robot.arm.setState(ArmSetStates.OFF);
 
             stateString = "Off";
@@ -93,7 +86,7 @@ public class Intake {
                 state = IntakeStates.INTAKE;
             }
         } else if (state == IntakeStates.INTAKE) {
-            leftWheel.set(INTAKE_SPEED);
+            wheel.set(INTAKE_SPEED);
             System.out.println("In Intake State");
 
             if (isCone) {
@@ -132,7 +125,7 @@ public class Intake {
         } else if (state == IntakeStates.HOLD) {
             System.out.println("In Hold");
             // stops motors without changing claw's open/closed status
-            leftWheel.set(HOLD_SPEED);
+            wheel.set(HOLD_SPEED);
             robot.arm.setState(ArmSetStates.OFF);
 
             if (isCone) {
@@ -172,20 +165,20 @@ public class Intake {
             }
 
             if (isCone && level == ScoringLevels.LEVEL_TWO) {
-                leftWheel.set(HOLD_SPEED);
+                wheel.set(HOLD_SPEED);
                 checkForAdvance(IntakeStates.RELEASING_CONE);
             } else {
                 if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                     // outtakes any game piece being held
                     releaseTimer.start();
                     if (releaseTimer.get() > 2 || level == ScoringLevels.LEVEL_ONE || (!isCone && level == ScoringLevels.LEVEL_TWO)) {
-                        leftWheel.set(-INTAKE_SPEED);
+                        wheel.set(-INTAKE_SPEED);
                         robot.rgb.setState(RGBStates.Neutral);
                         releaseTimer.reset();
                         releaseTimer.stop();
                     }
                 } else {
-                    leftWheel.set(HOLD_SPEED);
+                    wheel.set(HOLD_SPEED);
                     releaseTimer.reset();
                 }
 
