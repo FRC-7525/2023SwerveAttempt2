@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
+import frc.robot.autos.DriveOverChargeStation;
 import frc.robot.autos.LeaveCommunityAndBalance;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
@@ -24,6 +25,7 @@ import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -88,9 +90,10 @@ public class Robot extends TimedRobot {
         chooser.addOption("Move Right", new SideMove(swerve, 2, true));
         chooser.addOption("Move Left", new SideMove(swerve, -2, false));
         chooser.addOption("Leave Community and Balance", new LeaveCommunityAndBalance(this, swerve));
+        chooser.addOption("Drive over charge station, then balance.", new DriveOverChargeStation(this, swerve));
 
         SmartDashboard.putData("Auto Chooser", chooser);
-
+        
         reset();
     }
     
@@ -111,8 +114,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         SmartDashboard.putNumber("Pressure", compressor.getPressure());
     }
-
-
+    
+    
     @Override
     public void disabledPeriodic() {
 
@@ -139,12 +142,17 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
     }
 
+    public void disabledAutonomous() {
+        CommandScheduler.getInstance().cancelAll();
+    }
+
     @Override
     public void teleopInit() {
         intake.resetControllerChecks();
         swerve.setAngleAdjustment(180);
         // TODO: comment out once we have autos!
         //reset();
+        CommandScheduler.getInstance().cancelAll();
     }
 
     /** This function is called periodically during operator control. 
