@@ -12,6 +12,7 @@ import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.DriveOverChargeStation;
 import frc.robot.autos.LeaveCommunityAndBalance;
+import frc.robot.autos.ScoreGrabAndBalance;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
 import frc.robot.autos.ScoreLevelThreeAuto;
@@ -86,10 +87,11 @@ public class Robot extends TimedRobot {
         chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
         chooser.addOption("Score Level One Cone and Drive Back", new ScoreLevelOneAndBackAuto(this, swerve, true));
         chooser.addOption("Score Level Three Cube", new ScoreLevelThreeAuto(this));
-        chooser.addOption("Move Right", new SideMove(swerve, 2, true));
+        //chooser.addOption("Move Right", new SideMove(swerve, 2, true));
         chooser.addOption("Move Left", new SideMove(swerve, -2, false));
         chooser.addOption("Leave Community and Balance", new LeaveCommunityAndBalance(this, swerve));
         chooser.addOption("Drive over charge station, then balance.", new DriveOverChargeStation(this, swerve));
+        //chooser.addOption("Score, Grab, and Balance", new ScoreGrabAndBalance(this, swerve));
 
         SmartDashboard.putData("Auto Chooser", chooser);
         
