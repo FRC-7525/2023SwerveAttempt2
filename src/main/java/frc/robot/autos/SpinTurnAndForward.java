@@ -1,8 +1,5 @@
 package frc.robot.autos;
 
-import frc.robot.Constants;
-import frc.robot.subsystems.Swerve;
-
 import java.util.List;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -15,9 +12,15 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.subsystems.Swerve;
 
-public class StraightMove extends SequentialCommandGroup {
-    public StraightMove(Swerve swerve, double distance, boolean isReversed) {
+
+public class SpinTurnAndForward extends SequentialCommandGroup {    
+    public SpinTurnAndForward(Swerve swerve, double turnInDegrees, double distance, boolean isReversed) {
+        double turnInRadians = Math.toRadians(turnInDegrees);
+
         TrajectoryConfig config =
             new TrajectoryConfig(
                     Constants.AutoConstants.kMaxSpeedMetersPerSecond,
@@ -26,9 +29,8 @@ public class StraightMove extends SequentialCommandGroup {
 
         config.setReversed(isReversed);
 
-        // An example trajectory to follow.  All units in meters.
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(List.of(new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(distance, 0, new Rotation2d(0))), config);
-
+//        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(List.of(new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(0, 0, new Rotation2d(turnInRadians))), config);
+        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(List.of(new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(distance, 0, new Rotation2d(turnInRadians))), config);
         var thetaController =
             new ProfiledPIDController(
                 Constants.AutoConstants.kPThetaController, 0, 0, Constants.AutoConstants.kThetaControllerConstraints);
