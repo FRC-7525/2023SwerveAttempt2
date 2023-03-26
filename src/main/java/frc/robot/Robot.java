@@ -33,7 +33,14 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.math.controller.PIDController;
+import frc.robot.Constants;
 
 public class Robot extends TimedRobot {
     public static CTREConfigs ctreConfigs = new CTREConfigs();
@@ -59,6 +66,7 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<SequentialCommandGroup> chooser = new SendableChooser<>();
 
+
     public boolean isManual() {
         return true;
     }
@@ -80,6 +88,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
+
+        PathPlannerTrajectory ppTrajectory = PathPlanner.loadPath("New Path", new PathConstraints(1.0, 1.0));
         chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
         chooser.addOption("Lv3 Cube, Backwards, Auto Balance", new BalanceAuto(this, swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
@@ -92,6 +102,7 @@ public class Robot extends TimedRobot {
         chooser.addOption("Leave Community and Balance", new LeaveCommunityAndBalance(this, swerve));
         chooser.addOption("Drive over charge station, then balance.", new DriveOverChargeStation(this, swerve));
         //chooser.addOption("Score, Grab, and Balance", new ScoreGrabAndBalance(this, swerve));
+        chooser.addOption("PathWeaver", followTrajectoryCommand(ppTrajectory, true));
 
         SmartDashboard.putData("Auto Chooser", chooser);
         
@@ -229,4 +240,26 @@ public class Robot extends TimedRobot {
     public void testPeriodic() {
         compressor.enableAnalog(119, 120);
     }
+
+    public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+        return new SequentialCommandGroup(
+             new InstantCommand(() -> {
+               // Reset odometry for the first path you run during auto
+               if(isFirstPath){
+                   swerve.resetOdometry(traj.getInitialHolonomicPose());
+               }
+             }),
+             new PPSwerveControllerCommand(
+                 traj, 
+                 swerve::getPose, // Pose supplier
+                 Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
+                 new PIDController(0, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                 new PIDController(0, 0, 0), // Y controller (usually the same values as X controller)
+                 new PIDController(0, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                 swerve::setModuleStates, // Module states consumer
+                 true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+                 this // Requires this drive subsystem
+             )
+         );
+     }
 }
