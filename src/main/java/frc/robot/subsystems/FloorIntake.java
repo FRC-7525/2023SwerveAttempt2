@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import org.apache.commons.io.filefilter.TrueFileFilter;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -20,6 +18,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 enum FloorIntakeStates {
     OFF,
     ON,
+    OUTTAKE,
     DOWN_HOLD
 }
 
@@ -63,6 +62,10 @@ public class FloorIntake {
             } else {
                 motor.set(FLOOR_INTAKE_SPEED);
             }
+        } else if (state == FloorIntakeStates.OUTTAKE) {
+            stateString = "Outtake Cube";
+            solenoid.set(true);
+            motor.set(-FLOOR_INTAKE_SPEED);
         } else if (state == FloorIntakeStates.DOWN_HOLD) {
             stateString = "On (Wheels Off)";
             solenoid.set(true);

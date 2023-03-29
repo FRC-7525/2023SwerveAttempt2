@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
      * initialization code.
      */
     @Override
-    public void robotInit() {        
+    public void robotInit() {
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
@@ -110,6 +110,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         reset();
+        swerve.gyro.reset();
         CommandScheduler.getInstance().schedule(chooser.getSelected());
     }
 
@@ -127,7 +128,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         intake.resetControllerChecks();
-        swerve.setAngleAdjustment(180);
         // TODO: comment out once we have autos!
         //reset();
     }

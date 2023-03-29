@@ -45,7 +45,7 @@ public class Intake {
         state = IntakeStates.OFF;
     }
 
-    private final double INTAKE_SPEED = 0.2;
+    private final double INTAKE_SPEED = 0.5;
     Timer releaseTimer = new Timer();
 
 
@@ -54,8 +54,6 @@ public class Intake {
 
     public Intake(Robot robot) {
         wheel.restoreFactoryDefaults();
-        
-        wheel.setSmartCurrentLimit(15);
         this.robot = robot;
 
         DataLog log = DataLogManager.getLog();
@@ -171,7 +169,7 @@ public class Intake {
                 if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                     // outtakes any game piece being held
                     releaseTimer.start();
-                    if (releaseTimer.get() > 2 || level == ScoringLevels.LEVEL_ONE || (!isCone && level == ScoringLevels.LEVEL_TWO)) {
+                    if (releaseTimer.get() > 0.3 || level == ScoringLevels.LEVEL_ONE || (!isCone && level == ScoringLevels.LEVEL_TWO)) {
                         wheel.set(-INTAKE_SPEED);
                         robot.rgb.setState(RGBStates.Neutral);
                         releaseTimer.reset();
