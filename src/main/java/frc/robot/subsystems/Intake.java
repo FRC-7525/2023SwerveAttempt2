@@ -10,6 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import edu.wpi.first.wpilibj.Timer;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+
 enum IntakeStates {
     OFF,
     INTAKE,
@@ -26,21 +30,22 @@ enum ScoringLevels {
 }
 
 public class Intake {
-    CANSparkMax leftWheel = new CANSparkMax(10, MotorType.kBrushless);
-    CANSparkMax rightWheel = new CANSparkMax(11, MotorType.kBrushless);
-    Solenoid claw = new Solenoid(PneumaticsModuleType.REVPH, 1);
+    CANSparkMax wheel = new CANSparkMax(10, MotorType.kBrushless);
+    Solenoid claw = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     DigitalInput hasNoObject = new DigitalInput(1);
 
     Robot robot = null;
     IntakeStates state = IntakeStates.OFF;
     ScoringLevels level = ScoringLevels.OFF;
+
+    StringLogEntry intakeStateLog;
     
     public void reset() {
         state = IntakeStates.OFF;
     }
 
-    private final double INTAKE_SPEED = 0.2;
+    private final double INTAKE_SPEED = 0.5;
     Timer releaseTimer = new Timer();
 
 
@@ -48,14 +53,11 @@ public class Intake {
     private final double HOLD_SPEED = 0.05;
 
     public Intake(Robot robot) {
-        leftWheel.restoreFactoryDefaults();
-        rightWheel.restoreFactoryDefaults();
-        
-        leftWheel.setSmartCurrentLimit(15);
-        rightWheel.setSmartCurrentLimit(15);
-
-        rightWheel.follow(leftWheel, true);
+        wheel.restoreFactoryDefaults();
         this.robot = robot;
+
+        DataLog log = DataLogManager.getLog();
+        intakeStateLog = new StringLogEntry(log, "/arm/state");
     }
 
     public void periodic() {
@@ -67,7 +69,7 @@ public class Intake {
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
             System.out.println("Intake Off");
-            leftWheel.stopMotor();
+            wheel.stopMotor();
             robot.arm.setState(ArmSetStates.OFF);
 
             stateString = "Off";
@@ -82,7 +84,7 @@ public class Intake {
                 state = IntakeStates.INTAKE;
             }
         } else if (state == IntakeStates.INTAKE) {
-            leftWheel.set(INTAKE_SPEED);
+            wheel.set(INTAKE_SPEED);
             System.out.println("In Intake State");
 
             if (isCone) {
@@ -121,7 +123,7 @@ public class Intake {
         } else if (state == IntakeStates.HOLD) {
             System.out.println("In Hold");
             // stops motors without changing claw's open/closed status
-            leftWheel.set(HOLD_SPEED);
+            wheel.set(HOLD_SPEED);
             robot.arm.setState(ArmSetStates.OFF);
 
             if (isCone) {
@@ -161,20 +163,20 @@ public class Intake {
             }
 
             if (isCone && level == ScoringLevels.LEVEL_TWO) {
-                leftWheel.set(HOLD_SPEED);
+                wheel.set(HOLD_SPEED);
                 checkForAdvance(IntakeStates.RELEASING_CONE);
             } else {
                 if (!robot.arm.waitingForFloorIntake() && robot.arm.nearSetpoint()) {
                     // outtakes any game piece being held
                     releaseTimer.start();
-                    if (releaseTimer.get() > 2 || level == ScoringLevels.LEVEL_ONE || (!isCone && level == ScoringLevels.LEVEL_TWO)) {
-                        leftWheel.set(-INTAKE_SPEED);
+                    if (releaseTimer.get() > 0.3 || level == ScoringLevels.LEVEL_ONE || (!isCone && level == ScoringLevels.LEVEL_TWO)) {
+                        wheel.set(-INTAKE_SPEED);
                         robot.rgb.setState(RGBStates.Neutral);
                         releaseTimer.reset();
                         releaseTimer.stop();
                     }
                 } else {
-                    leftWheel.set(HOLD_SPEED);
+                    wheel.set(HOLD_SPEED);
                     releaseTimer.reset();
                 }
 
@@ -188,6 +190,7 @@ public class Intake {
         }
 
         SmartDashboard.putString("Intake State", stateString);
+        intakeStateLog.append(stateString);
         resetControllerChecks();
     }    
 

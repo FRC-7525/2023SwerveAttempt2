@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.autos.BalanceAuto;
@@ -25,10 +22,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 
 public class Robot extends TimedRobot {
@@ -40,18 +36,12 @@ public class Robot extends TimedRobot {
     public XboxController primaryController = new XboxController(0);
     public XboxController secondaryController = new XboxController(1);
 
-    //public final PhotonCamera camera = new PhotonCamera("Swerve_Front");
-
     private static String ROTATION_SPEED_SD = "Rotation Speed";
     private static String FIELD_RELATIVE_SD = "Field RELATIVE";
-    //private Arm arm = new Arm(this);
-    private boolean isManual = false;
-
     public FloorIntake floorIntake = new FloorIntake(this);
     public RGB rgb = new RGB(this);
     public Intake intake = new Intake(this);
     public Arm arm = new Arm(this);
-    public Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
     private final SendableChooser<SequentialCommandGroup> chooser = new SendableChooser<>();
 
@@ -72,7 +62,7 @@ public class Robot extends TimedRobot {
      * initialization code.
      */
     @Override
-    public void robotInit() {        
+    public void robotInit() {
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
@@ -86,6 +76,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putData("Auto Chooser", chooser);
 
+        DataLogManager.start();
         reset();
     }
     
@@ -102,9 +93,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        compressor.enableAnalog(80, 120);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
-        SmartDashboard.putNumber("Pressure", compressor.getPressure());
+        arm.putEncoderPosition();
     }
 
 
@@ -120,6 +110,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         reset();
+        swerve.gyro.reset();
         CommandScheduler.getInstance().schedule(chooser.getSelected());
     }
 
@@ -137,7 +128,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         intake.resetControllerChecks();
-        swerve.setAngleAdjustment(180);
         // TODO: comment out once we have autos!
         //reset();
     }
@@ -146,14 +136,7 @@ public class Robot extends TimedRobot {
      * @return */
     @Override
     public void teleopPeriodic() {
-        /*
-        if (secondaryController.getRightBumperPressed()) {
-            isManual = !isManual;
-        }
-        */
-
         SmartDashboard.putBoolean("Manual Mode", this.isManual());
-
 
         /* Drive */
         if (primaryController.getXButtonPressed()) {
@@ -166,7 +149,6 @@ public class Robot extends TimedRobot {
 
         double translationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftY()), Constants.stickDeadband);
         double rotationVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getRightX()), Constants.stickDeadband);
-        //rotationVal += translationVal * 0.01;
         double strafeVal = -MathUtil.applyDeadband(Swerve.squareInput(primaryController.getLeftX()), Constants.stickDeadband);
         
         if (primaryController.getLeftBumper()) {
@@ -183,20 +165,6 @@ public class Robot extends TimedRobot {
                 toggleFieldRelative,
                 false);
 
-        
-        /* Vision */
-        /* 
-        PhotonPipelineResult result = camera.getLatestResult();
-        List<PhotonTrackedTarget> targets = result.getTargets();
-
-        List<Double> ids = new ArrayList<Double>();
-        for (PhotonTrackedTarget target : targets) {
-            ids.add(Double.valueOf(target.getFiducialId()));
-        }
-
-        SmartDashboard.putBoolean("Has Target", !targets.isEmpty());
-        SmartDashboard.putNumberArray("Target IDs", ids.stream().mapToDouble(d -> d).toArray());
-        */
 
         arm.periodic();
         intake.periodic();
@@ -213,6 +181,5 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during test mode. */
     @Override
     public void testPeriodic() {
-        compressor.enableAnalog(119, 120);
     }
 }
