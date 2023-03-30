@@ -71,18 +71,10 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
-        chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
-        chooser.addOption("Lv3 Cube, Backwards, Auto Balance", new BalanceAuto(this, swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
-        chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
-        chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
-        chooser.addOption("Score Level One Cone and Drive Back", new ScoreLevelOneAndBackAuto(this, swerve, true));
-        chooser.addOption("Score Level Three Cube", new ScoreLevelThreeAuto(this));
-        //chooser.addOption("Move Right", new SideMove(swerve, 2, true));
-        chooser.addOption("Move Left", new SideMove(swerve, -2, false));
-        chooser.addOption("Leave Community and Balance", new LeaveCommunityAndBalance(this, swerve));
-        chooser.addOption("Drive over charge station, then balance.", new DriveOverChargeStation(this, swerve));
-        //chooser.addOption("Score, Grab, and Balance", new ScoreGrabAndBalance(this, swerve));
+        chooser.addOption("Lvl 3, Backwards, Balance", new BalanceAuto(this, swerve));
+        chooser.addOption("Lvl 3, Around Charge Station, Balance", new LeaveCommunityAndBalance(this, swerve));
+        chooser.addOption("Lvl 3, Over Charge Station, Balance", new DriveOverChargeStation(this, swerve));
 
         SmartDashboard.putData("Auto Chooser", chooser);
         DataLogManager.start();
