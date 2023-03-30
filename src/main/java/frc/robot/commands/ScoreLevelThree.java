@@ -30,7 +30,7 @@ public class ScoreLevelThree extends CommandBase {
     public void execute() {
         if (state == ScoreLevelThreeState.SCORE) {
             stateTimer.start();
-            if (stateTimer.get() > 5) {
+            if (stateTimer.get() > 3) {
                 state = ScoreLevelThreeState.RETRACT;
                 robot.intake.reset();
                 stateTimer.reset();

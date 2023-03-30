@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -10,7 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 enum ArmStates {
     OFF,
@@ -35,57 +39,81 @@ enum ArmSetStates {
 
 public class Arm {
     private String stateString;
-    CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
-    CANSparkMax followMotor = new CANSparkMax(2, MotorType.kBrushless);
-    Solenoid arm = new Solenoid(PneumaticsModuleType.REVPH, 0);
-    PIDController controller = new PIDController(4, 0, 0);
-    DutyCycleEncoder encoder = new DutyCycleEncoder(0);
+    CANSparkMax pivotMotor = new CANSparkMax(1, MotorType.kBrushless);
+    CANSparkMax pivotFollower = new CANSparkMax(2, MotorType.kBrushless);
+    PIDController pivotController = new PIDController(5, 0, 0);
+    DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(0);
+    final double DOWN = 0.36;
+    double pivotSetpoint = DOWN;
+
+    CANSparkMax extensionMotor = new CANSparkMax(11, MotorType.kBrushless);
+    PIDController extensionController = new PIDController(0.1, 0, 0);
+    RelativeEncoder extensionEncoder = extensionMotor.getEncoder();
+
     ArmStates state = ArmStates.OFF;
     ArmStates nextState = ArmStates.OFF;
     Timer turningOffTimer = new Timer();
     Timer floorTimer = new Timer();
     Robot robot = null;
-    double setpoint = 0.8;
+    final double ARM_OUT = 22;
+    double extensionSetpoint = 0;
+
+    final double CUBE_INTAKE = 0.045;
+
+    StringLogEntry armStateLog;
 
     public Arm(Robot robot) {
         this.robot = robot;
-        motor.restoreFactoryDefaults();
-        followMotor.follow(motor, true);
+        pivotMotor.restoreFactoryDefaults();
+        pivotFollower.follow(pivotMotor, true);
+
+        extensionMotor.restoreFactoryDefaults();
+        extensionEncoder.setPosition(0);
+
+        DataLog log = DataLogManager.getLog();
+        armStateLog = new StringLogEntry(log, "/arm/state");
     }
 
     private void toSetpoint() {
-        if (encoder.getAbsolutePosition() > 0.55) {
-            motor.set(controller.calculate(encoder.getAbsolutePosition(), setpoint));
+        if (pivotEncoder.getAbsolutePosition() > 0.1) {
+            pivotMotor.set(pivotController.calculate(pivotEncoder.getAbsolutePosition(), pivotSetpoint));
         } else {
-            motor.stopMotor();
+            pivotMotor.stopMotor();
             System.out.println("ARM ENCODER UNPLUGGED");
         }
+
+        extensionMotor.set(extensionController.calculate(extensionEncoder.getPosition(), extensionSetpoint));
     }
 
     public void reset() {
         state = ArmStates.OFF;
     }
 
+    public void putEncoderPosition() {
+        SmartDashboard.putNumber("Pivot Encoder Position", pivotEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber("Extender Encoder Position", extensionEncoder.getPosition());
+        SmartDashboard.putBoolean("Extender Near Zero?", Math.abs(extensionEncoder.getPosition()) < 0.5);
+    }
+
     public void periodic() {
         // Put encoder value on SmartDashboard
-        SmartDashboard.putNumber("Arm Encoder Position", encoder.getAbsolutePosition());
         SmartDashboard.putBoolean("NearSetpoint", this.nearSetpoint());
         SmartDashboard.putBoolean("WaitingForFloorIntake", this.waitingForFloorIntake());
 
         if (state == ArmStates.OFF) {
             // Set position to low
-            setpoint = 0.8;
-            arm.set(false);
+            pivotSetpoint = DOWN;
+            extensionSetpoint = 0;
             stateString = "Off";
             robot.floorIntake.setState(FloorIntakeStates.OFF);
         } else if (state == ArmStates.CUBE_ON) {
             // Set position to high
-            setpoint = 0.745;
-            arm.set(false);
+            pivotSetpoint = DOWN - CUBE_INTAKE;
+            extensionSetpoint = 0;
             stateString = "Intaking Cube";
             robot.floorIntake.setState(FloorIntakeStates.ON);
         } else if (state == ArmStates.CONE_ON) {
-            setpoint = 0.6;
+            pivotSetpoint = DOWN - 0.195;
             stateString = "Intaking Cone";
             if (nearSetpoint()) {
                 robot.floorIntake.setState(FloorIntakeStates.OFF);
@@ -94,10 +122,10 @@ public class Arm {
             }
         } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE_UP) {
             floorTimer.start();
-            setpoint = 0.6;
+            pivotSetpoint = DOWN - 0.195;
             stateString = "Moving Floor Intake Out (Pre-Arm Down)";
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
-            arm.set(false);
+            extensionSetpoint = 0;
 
             if (floorTimer.get() > 0.8) {
                 state = ArmStates.WAITING_FOR_FLOOR_INTAKE_DOWN;
@@ -107,22 +135,22 @@ public class Arm {
             }
         } else if (state == ArmStates.TURNING_OFF) {
             turningOffTimer.start();
-            arm.set(false);
+            extensionSetpoint = 0;
             stateString = "Arm Resetting (for safety)";
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
-            if (turningOffTimer.get() > 3) {
+            if (turningOffTimer.get() > 1.1) {
                 state = ArmStates.OFF;
                 turningOffTimer.reset();
                 turningOffTimer.stop();
-            } else if (turningOffTimer.get() > 2) {
-                setpoint = 0.8;
+            } else if (turningOffTimer.get() > 0.3) {
+                pivotSetpoint = DOWN;
             }
         } else if (state == ArmStates.WAITING_FOR_FLOOR_INTAKE_DOWN) {
             floorTimer.start();
-            setpoint = 0.8;
+            pivotSetpoint = DOWN;
             stateString = "Moving Floor Intake Pre-Arm Up / Move Arm Down";
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
-            arm.set(false);
+            extensionSetpoint = 0;
 
             if (floorTimer.get() > 0.8) {
                 state = nextState;
@@ -131,38 +159,44 @@ public class Arm {
             }
         } else if (state == ArmStates.LEVEL_ONE) {
             stateString = "Level One Scoring";
-            setpoint = 0.69;
-            robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+            if (robot.intake.isCone()) {
+                pivotSetpoint = DOWN - 0.11;
+                robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
+            } else {
+                pivotSetpoint = DOWN - CUBE_INTAKE;
+                robot.floorIntake.setState(FloorIntakeStates.OUTTAKE);
+            }
         } else if (state == ArmStates.LEVEL_TWO) {
             stateString = "Level Two Scoring";
-            setpoint = 0.6;
+            pivotSetpoint = DOWN - 0.18;
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
             if (robot.intake.isCone()) {
                 if (nearSetpoint()) {
-                    arm.set(true);
+                    extensionSetpoint = ARM_OUT;
                 } else {
-                    arm.set(false);
+                    extensionSetpoint = 0;
                 } 
             } else {
-                arm.set(false);
+                extensionSetpoint = 0;
             }
         } else if (state == ArmStates.LEVEL_THREE) {
             stateString = "Level Three Scoring";
-            setpoint = 0.58;
+            pivotSetpoint = DOWN - 0.22;
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
             if (nearSetpoint()) {
-                arm.set(true);
+                extensionSetpoint = ARM_OUT;
             } else {
-                arm.set(false);
+                extensionSetpoint = 0;
             }
         }
 
         SmartDashboard.putString("Arm State", stateString);
         this.toSetpoint();
+        armStateLog.append(stateString);
     }
 
     public boolean nearSetpoint() {
-        return Math.abs(encoder.getAbsolutePosition() - setpoint) < 0.02;
+        return Math.abs(pivotEncoder.getAbsolutePosition() - pivotSetpoint) < 0.02;
     }
 
     public boolean waitingForFloorIntake() {
@@ -228,4 +262,5 @@ public class Arm {
             }
         }
     }
+
 }
