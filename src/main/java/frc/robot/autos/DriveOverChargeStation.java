@@ -12,8 +12,8 @@ public class DriveOverChargeStation extends SequentialCommandGroup {
     public DriveOverChargeStation(Robot robot, Swerve swerve){
         addCommands(
             new ScoreLevelThree(robot),
-            new StraightMove(swerve, -4.5, true),
-            new StraightMove(swerve, 1.7, false),
+            new StraightMove(swerve, -5.5, true),
+            new StraightMove(swerve, 2.7, false),
             new AutoBalance(robot, swerve)
         );
     }
