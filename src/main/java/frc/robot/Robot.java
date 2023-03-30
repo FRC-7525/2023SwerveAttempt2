@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.DriveOverChargeStation;
-import frc.robot.autos.LeaveCommunityAndBalance;
+import frc.robot.autos.LeaveCommunityAndBalanceBlue;
+import frc.robot.autos.LeaveCommunityAndBalanceRed;
 import frc.robot.autos.ScoreGrabAndBalance;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
@@ -73,7 +74,8 @@ public class Robot extends TimedRobot {
         CameraServer.startAutomaticCapture();
         chooser.addOption("Do Nothing", new DoNothingAuto());
         chooser.addOption("Lvl 3, Backwards, Balance", new BalanceAuto(this, swerve));
-        chooser.addOption("Lvl 3, Around Charge Station, Balance", new LeaveCommunityAndBalance(this, swerve));
+        chooser.addOption("RED Lvl 3, Around Charge Station, Balance", new LeaveCommunityAndBalanceRed(this, swerve));
+        chooser.addOption("BLUE Lvl 3, Around Charge Station, Balance", new LeaveCommunityAndBalanceBlue(this, swerve));
         chooser.addOption("Lvl 3, Over Charge Station, Balance", new DriveOverChargeStation(this, swerve));
 
         SmartDashboard.putData("Auto Chooser", chooser);
