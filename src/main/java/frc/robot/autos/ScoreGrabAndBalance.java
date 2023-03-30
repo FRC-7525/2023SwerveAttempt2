@@ -14,7 +14,7 @@ public class ScoreGrabAndBalance extends SequentialCommandGroup {
         addCommands(
            // new ScoreLevelThreeAuto(robot),
             new StraightMove(swerve, -6.0, true),
-            new SpinTurnGyro(swerve, 180),
+            new SpinTurnGyro(swerve, 180)
            // new IntakeFromFloor(robot, swerve, 1, true, 0.8),
             /*new StraightMove(swerve, -2.3, true),
             new SideMove(swerve, -2.7, false),
