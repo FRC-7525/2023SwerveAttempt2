@@ -225,4 +225,16 @@ public class Intake {
         level = ScoringLevels.LEVEL_THREE;
         state = IntakeStates.OUTTAKE;
     }
+
+    public void setUpIntakeCube() {
+        isCone = false;
+        state = IntakeStates.INTAKE;
+    }
+
+    // Autonomous Reset
+
+    public void resetIntakeCube() {
+        isCone = false;
+        state = IntakeStates.HOLD;
+    }
 }

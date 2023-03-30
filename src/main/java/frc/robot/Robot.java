@@ -8,9 +8,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.autos.BalanceAuto;
 import frc.robot.autos.DoNothingAuto;
+import frc.robot.autos.DriveOverChargeStation;
+import frc.robot.autos.LeaveCommunityAndBalance;
+import frc.robot.autos.ScoreGrabAndBalance;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
 import frc.robot.autos.ScoreLevelOneAuto;
 import frc.robot.autos.ScoreLevelThreeAuto;
+import frc.robot.autos.SideMove;
 import frc.robot.autos.StraightMove;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FloorIntake;
@@ -19,6 +23,7 @@ import frc.robot.subsystems.RGB;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -66,16 +71,12 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber(ROTATION_SPEED_SD, 1);
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         CameraServer.startAutomaticCapture();
-        chooser.setDefaultOption("Drive Backwards", new StraightMove(swerve, -3, true));
-        chooser.addOption("Lv3 Cube, Backwards, Auto Balance", new BalanceAuto(this, swerve));
         chooser.addOption("Do Nothing", new DoNothingAuto());
-        chooser.addOption("Score Level One Cube", new ScoreLevelOneAuto(this, false));
-        chooser.addOption("Score Level One Cone", new ScoreLevelOneAuto(this, true));
-        chooser.addOption("Score Level One Cone and Drive Back", new ScoreLevelOneAndBackAuto(this, swerve, true));
-        chooser.addOption("Score Level Three Cube", new ScoreLevelThreeAuto(this));
+        chooser.addOption("Lvl 3, Backwards, Balance", new BalanceAuto(this, swerve));
+        chooser.addOption("Lvl 3, Around Charge Station, Balance", new LeaveCommunityAndBalance(this, swerve));
+        chooser.addOption("Lvl 3, Over Charge Station, Balance", new DriveOverChargeStation(this, swerve));
 
         SmartDashboard.putData("Auto Chooser", chooser);
-
         DataLogManager.start();
         reset();
     }
@@ -96,8 +97,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean(FIELD_RELATIVE_SD, toggleFieldRelative);
         arm.putEncoderPosition();
     }
-
-
+    
+    
     @Override
     public void disabledPeriodic() {
 
@@ -125,11 +126,16 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
     }
 
+    public void disabledAutonomous() {
+        CommandScheduler.getInstance().cancelAll();
+    }
+
     @Override
     public void teleopInit() {
         intake.resetControllerChecks();
         // TODO: comment out once we have autos!
         //reset();
+        CommandScheduler.getInstance().cancelAll();
     }
 
     /** This function is called periodically during operator control. 
