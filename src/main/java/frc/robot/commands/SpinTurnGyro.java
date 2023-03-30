@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 
 
-public class SpinTurnLuciaVersion extends CommandBase {    
+public class SpinTurnGyro extends CommandBase {    
     Swerve swerve = null;
     double finalYaw = 0;
 
-    public SpinTurnLuciaVersion(Swerve swerve, double turnInDegrees) {
+    public SpinTurnGyro(Swerve swerve, double turnInDegrees) {
         this.finalYaw = swerve.getYaw().getDegrees() + turnInDegrees;
         this.swerve = swerve;
     }

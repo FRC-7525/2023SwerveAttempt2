@@ -59,8 +59,6 @@ public class SwerveModule {
             double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Constants.Swerve.wheelCircumference, Constants.Swerve.driveGearRatio);
             mDriveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, feedforward.calculate(desiredState.speedMetersPerSecond));
         }
-
-        SmartDashboard.putNumber("GGGGGMod " + this.moduleNumber + " Input Current", mDriveMotor.getSupplyCurrent());
     }
 
     private void setAngle(SwerveModuleState desiredState){
