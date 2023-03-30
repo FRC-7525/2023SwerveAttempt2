@@ -46,10 +46,10 @@ public class RGB {
 
     public void periodic() {
         if (state == RGBStates.Cone) {
-            pdh.setSwitchableChannel(true);
+            pdh.setSwitchableChannel(false);
             stateString = "Cone";
         } else if (state == RGBStates.Cube) {
-            pdh.setSwitchableChannel(false);
+            pdh.setSwitchableChannel(true);
             stateString = "Cube";
         } else if (state == RGBStates.Neutral) {
             stateString = "Neutral";
