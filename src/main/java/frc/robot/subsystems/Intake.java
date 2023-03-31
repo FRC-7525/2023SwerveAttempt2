@@ -68,24 +68,20 @@ public class Intake {
 
         if (state == IntakeStates.OFF) {
             // stops motor movement and closes claw
-            System.out.println("Intake Off");
             wheel.stopMotor();
             robot.arm.setState(ArmSetStates.OFF);
 
             stateString = "Off";
             // shift to intakes
             if (robot.primaryController.getBButtonPressed()) {
-                System.out.println("B Button Pressed (switching to cube intake)");
                 isCone = false;
                 state = IntakeStates.INTAKE;
             } else if (robot.primaryController.getYButtonPressed()) {
-                System.out.println("Y Button Pressed (switching to cone intake)");
                 isCone = true;
                 state = IntakeStates.INTAKE;
             }
         } else if (state == IntakeStates.INTAKE) {
             wheel.set(INTAKE_SPEED);
-            System.out.println("In Intake State");
 
             if (isCone) {
                 stateString = "Intaking Cone";
@@ -114,14 +110,11 @@ public class Intake {
 
             // changes to hold once beam brake is interrupted
             if (!hasNoObject.get() && !robot.isManual()) {
-                System.out.println("Auto Transition");
                 state = IntakeStates.HOLD;
             } else if (robot.isManual()) {
-                System.out.println("Check Manual Transition");
                 checkForAdvance(IntakeStates.HOLD);
             }
         } else if (state == IntakeStates.HOLD) {
-            System.out.println("In Hold");
             // stops motors without changing claw's open/closed status
             wheel.set(HOLD_SPEED);
             robot.arm.setState(ArmSetStates.OFF);
@@ -223,6 +216,12 @@ public class Intake {
     public void setUpLevelThree() {
         isCone = false;
         level = ScoringLevels.LEVEL_THREE;
+        state = IntakeStates.OUTTAKE;
+    }
+
+    public void setUpLevelTwoCube() {
+        isCone = false;
+        level = ScoringLevels.LEVEL_TWO;
         state = IntakeStates.OUTTAKE;
     }
 

@@ -12,7 +12,7 @@ public class LeaveCommunityAndBalanceRed extends SequentialCommandGroup {
             new ScoreLevelThree(robot),
             new StraightMove(swerve, -4.5, true),
             new SideMove(swerve, 1.6, true),
-            new StraightMove(swerve, 2.5, false),
+            new StraightMove(swerve, 3.2, false),
             new AutoBalance(robot, swerve)
         );
     }

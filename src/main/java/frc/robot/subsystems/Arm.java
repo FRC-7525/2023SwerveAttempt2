@@ -55,7 +55,7 @@ public class Arm {
     Timer turningOffTimer = new Timer();
     Timer floorTimer = new Timer();
     Robot robot = null;
-    final double ARM_OUT = 22;
+    final double ARM_OUT = 23.5;
     double extensionSetpoint = 0;
 
     final double CUBE_INTAKE = 0.045;
@@ -168,15 +168,16 @@ public class Arm {
             }
         } else if (state == ArmStates.LEVEL_TWO) {
             stateString = "Level Two Scoring";
-            pivotSetpoint = DOWN - 0.18;
             robot.floorIntake.setState(FloorIntakeStates.DOWN_HOLD);
             if (robot.intake.isCone()) {
+                pivotSetpoint = DOWN - 0.205;
                 if (nearSetpoint()) {
                     extensionSetpoint = ARM_OUT;
                 } else {
                     extensionSetpoint = 0;
                 } 
             } else {
+                pivotSetpoint = DOWN - 0.18;
                 extensionSetpoint = 0;
             }
         } else if (state == ArmStates.LEVEL_THREE) {

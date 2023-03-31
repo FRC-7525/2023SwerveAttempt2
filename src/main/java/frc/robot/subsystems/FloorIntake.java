@@ -65,7 +65,7 @@ public class FloorIntake {
         } else if (state == FloorIntakeStates.OUTTAKE) {
             stateString = "Outtake Cube";
             solenoid.set(true);
-            motor.set(-FLOOR_INTAKE_SPEED);
+            motor.set(-FLOOR_INTAKE_SPEED * 0.8);
         } else if (state == FloorIntakeStates.DOWN_HOLD) {
             stateString = "On (Wheels Off)";
             solenoid.set(true);

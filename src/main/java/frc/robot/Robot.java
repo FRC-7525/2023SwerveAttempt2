@@ -11,6 +11,7 @@ import frc.robot.autos.DoNothingAuto;
 import frc.robot.autos.DriveOverChargeStation;
 import frc.robot.autos.LeaveCommunityAndBalanceBlue;
 import frc.robot.autos.LeaveCommunityAndBalanceRed;
+import frc.robot.autos.LevelTwoCubeAndBalanceAuto;
 import frc.robot.autos.ScoreAndDriveFurther;
 import frc.robot.autos.ScoreGrabAndBalance;
 import frc.robot.autos.ScoreLevelOneAndBackAuto;
@@ -79,6 +80,7 @@ public class Robot extends TimedRobot {
         chooser.addOption("BLUE Lvl 3, Around Charge Station, Balance", new LeaveCommunityAndBalanceBlue(this, swerve));
         chooser.addOption("Lvl 3, Over Charge Station, Balance", new DriveOverChargeStation(this, swerve));
         chooser.addOption("Lvl 3 and Back Further", new ScoreAndDriveFurther(this, swerve));
+        chooser.addOption("Lvl 2 Cube, Backwards, Balance", new LevelTwoCubeAndBalanceAuto(this, swerve));
 
         SmartDashboard.putData("Auto Chooser", chooser);
         DataLogManager.start();

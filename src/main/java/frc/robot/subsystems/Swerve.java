@@ -56,6 +56,7 @@ public class Swerve extends SubsystemBase {
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         SmartDashboard.putNumber("Gyro Heading", gyro.getYaw());
+        SmartDashboard.putBoolean("Facing forward?", Math.abs(gyro.getYaw()) < 10);
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
